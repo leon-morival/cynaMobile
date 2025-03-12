@@ -82,11 +82,22 @@ export default function CartScreen() {
           text2: "Vous devez être connecté pour effectuer un paiement.",
         });
         setLoading(false);
-        return;
+        return { error: new Error("Token manquant") };
       }
 
       // Get payment intent from your backend
       const { clientSecret } = await createPaymentIntent(totalAmount, token);
+      // Added check for invalid clientSecret (or invalid token)
+      if (!clientSecret) {
+        Toast.show({
+          type: "error",
+          text1: "Erreur",
+          text2:
+            "Token invalide ou erreur lors de la récupération du paiement.",
+        });
+        setLoading(false);
+        return { error: new Error("Token invalide ou clientSecret manquant") };
+      }
       console.log("ClientSecret retrieved:", clientSecret);
 
       // Initialize the Payment Sheet

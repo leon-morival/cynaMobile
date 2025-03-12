@@ -1,13 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import Toast from "react-native-toast-message";
 import AuthInput from "../Common/AuthInput";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AuthContext } from "../../context/AuthContext";
+import { User } from "../../models/Entities";
 
 const BASE_URL = "https://api.leonmorival.xyz/api";
 
 const Login = () => {
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
+  const { token, setToken, user, setUser } = useContext(AuthContext);
 
   const loginHandler = async () => {
     console.log("login pressed");
@@ -30,6 +34,11 @@ const Login = () => {
           text2: errorMsg,
         });
       }
+      await AsyncStorage.setItem("token", data.token);
+      setToken(data.token);
+      if (data.user) {
+        setUser(data.user);
+      }
       Toast.show({
         type: "success",
         text1: "Login",
@@ -43,6 +52,23 @@ const Login = () => {
       });
     }
   };
+
+  if (token) {
+    return (
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Profile</Text>
+        {user ? (
+          <>
+            <Text>Email: {user.email}</Text>
+            <Text>Civilité: {user.civilite}</Text>
+            {/* ...other user info... */}
+          </>
+        ) : (
+          <Text>Chargement des informations...</Text>
+        )}
+      </View>
+    );
+  }
 
   return (
     <View style={styles.section}>
@@ -58,7 +84,6 @@ const Login = () => {
         label="Mot de passe :"
         value={loginPassword}
         onChangeText={setLoginPassword}
-        secureTextEntry={true}
       />
       <TouchableOpacity style={styles.button} onPress={loginHandler}>
         <Text style={styles.buttonText}>Se connecter</Text>
@@ -68,7 +93,6 @@ const Login = () => {
 };
 
 const styles = StyleSheet.create({
-  // ...existing style properties...
   section: {
     width: "80%",
     marginBottom: 30,

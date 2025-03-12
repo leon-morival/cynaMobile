@@ -10,10 +10,13 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ offer }) => {
   const navigation = useNavigation<any>();
 
+  const handlePress = () => {
+    console.log("Navigating to ProductDetail for product id", offer.id);
+    navigation.navigate("ProductDetail", { product: offer });
+  };
+
   return (
-    <TouchableOpacity
-      onPress={() => navigation.navigate("ProductDetail", { product: offer })}
-    >
+    <TouchableOpacity onPress={handlePress}>
       <View style={styles.card}>
         <Image source={{ uri: offer.image_path }} style={styles.image} />
         <View style={styles.info}>

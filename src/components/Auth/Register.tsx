@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import Toast from "react-native-toast-message";
 import AuthInput from "../Common/AuthInput";
 import { Civilite } from "../../models/Entities";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AuthContext } from "../../context/AuthContext";
 
 const BASE_URL = "https://api.leonmorival.xyz/api";
 
@@ -14,9 +16,9 @@ const Register = () => {
   const [registerConfirmPassword, setRegisterConfirmPassword] = useState("");
   const [registerSiret, setRegisterSiret] = useState("");
   const [registerCivilite, setRegisterCivilite] = useState(Civilite.MR);
+  const { token, setToken, user, setUser } = useContext(AuthContext);
 
   const registerHandler = async () => {
-    console.log("register pressed");
     if (registerPassword !== registerConfirmPassword) {
       return Toast.show({
         type: "error",
@@ -52,6 +54,13 @@ const Register = () => {
           text2: errorMsg,
         });
       }
+      if (data.token) {
+        await AsyncStorage.setItem("token", data.token);
+        setToken(data.token);
+      }
+      if (data.user) {
+        setUser(data.user);
+      }
       Toast.show({
         type: "success",
         text1: "Register",
@@ -65,6 +74,22 @@ const Register = () => {
       });
     }
   };
+
+  if (token) {
+    return (
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Profile</Text>
+        {user ? (
+          <>
+            <Text>Email: {user.email}</Text>
+            <Text>Civilité: {user.civilite}</Text>
+          </>
+        ) : (
+          <Text>Chargement des informations...</Text>
+        )}
+      </View>
+    );
+  }
 
   return (
     <View style={styles.section}>
@@ -119,7 +144,6 @@ const Register = () => {
 };
 
 const styles = StyleSheet.create({
-  // ...existing style properties...
   section: {
     width: "80%",
     marginBottom: 30,
