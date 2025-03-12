@@ -12,12 +12,23 @@ import { useStripe, initStripe } from "@stripe/stripe-react-native";
 import { createPaymentIntent } from "../../../services/paymentService";
 import Toast from "react-native-toast-message";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Colors } from "../../../constants/Colors";
+
+import { SubscriptionOffer } from "../../models/Entities";
+
+// Add a new type for cart items based on SubscriptionOffer
+type CartItem = SubscriptionOffer & {
+  quantity: number;
+  type: string;
+  url: string;
+};
 
 export default function CartScreen() {
   const navigation = useNavigation();
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const [loading, setLoading] = useState(false);
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState<CartItem[]>([]);
   const [token, setToken] = useState(
     "5|D2q0d29ZgSx8hvjuRa8dTmXiW2boNX9p97nz8oJL60761c0d"
   );
@@ -43,42 +54,16 @@ export default function CartScreen() {
   // };
 
   const loadCartData = async () => {
-    // For demonstration, using static data
-    // In a real app, you would fetch from your API using:
-    // const response = await fetch("https://api.leonmorival.xyz/api/cart", {
-    //   headers: {
-    //     "Authorization": `Bearer ${token}`
-    //   }
-    // });
-    // const data = await response.json();
-    // setCart(data);
-
-    setCart([
-      {
-        id: 1,
-        name: "Product 1",
-        price: 100,
-        quantity: 2,
-        type: "mensuel",
-        url: "https://cdn.shopify.com/s/files/1/2303/2711/files/2_e822dae0-14df-4cb8-b145-ea4dc0966b34.jpg?v=1617059123",
-      },
-      {
-        id: 2,
-        name: "Product 2",
-        price: 200,
-        quantity: 4,
-        type: "annuel",
-        url: "https://cdn.shopify.com/s/files/1/2303/2711/files/2_e822dae0-14df-4cb8-b145-ea4dc0966b34.jpg?v=1617059123",
-      },
-      {
-        id: 3,
-        name: "Product 3",
-        price: 300,
-        quantity: 4,
-        type: "mensuel",
-        url: "https://cdn.shopify.com/s/files/1/2303/2711/files/2_e822dae0-14df-4cb8-b145-ea4dc0966b34.jpg?v=1617059123",
-      },
-    ]);
+    try {
+      const storedCart = await AsyncStorage.getItem("cart");
+      if (storedCart !== null) {
+        setCart(JSON.parse(storedCart));
+      } else {
+        setCart([]);
+      }
+    } catch (error) {
+      console.log("Error loading cart from storage:", error);
+    }
   };
 
   const totalAmount = cart.reduce(
@@ -180,6 +165,7 @@ export default function CartScreen() {
       // });
 
       // For demo purposes, just clear the local state
+      await AsyncStorage.removeItem("cart");
       setCart([]);
     } catch (error) {
       console.log("Error clearing cart:", error);
@@ -192,7 +178,7 @@ export default function CartScreen() {
         <Text style={styles.emptyText}>Votre panier est vide</Text>
         <TouchableOpacity
           style={styles.shopButton}
-          onPress={() => navigation.navigate("shop")}
+          onPress={() => navigation.navigate("Shop")}
         >
           <Text style={styles.shopButtonText}>Continuer mes achats</Text>
         </TouchableOpacity>
@@ -244,7 +230,7 @@ export default function CartScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#302082",
+    backgroundColor: Colors.primary,
     position: "relative",
   },
   productContainer: {
@@ -343,7 +329,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   shopButton: {
-    backgroundColor: "#FF6B00",
+    backgroundColor: Colors.secondary,
     padding: 12,
     borderRadius: 5,
     width: "80%",

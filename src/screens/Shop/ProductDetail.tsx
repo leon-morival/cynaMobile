@@ -8,7 +8,10 @@ import {
   ScrollView,
 } from "react-native";
 import { RouteProp, useRoute } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SubscriptionOffer } from "../../models/Entities";
+import { Colors } from "../../../constants/Colors";
+import Toast from "react-native-toast-message";
 
 type ProductDetailRouteProp = RouteProp<
   { params: { product: SubscriptionOffer } },
@@ -19,28 +22,46 @@ export default function ProductDetail() {
   const { params } = useRoute<ProductDetailRouteProp>();
   const product = params.product;
 
+  const addToCart = async () => {
+    try {
+      const storedCart = await AsyncStorage.getItem("cart");
+      const currentCart = storedCart ? JSON.parse(storedCart) : [];
+      // Map the product to the cart item structure
+      const newItem = {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        quantity: 1,
+        type: "subscription",
+        url: product.image_path,
+      };
+      currentCart.push(newItem);
+      await AsyncStorage.setItem("cart", JSON.stringify(currentCart));
+      Toast.show({
+        type: "success",
+        text1: "Produit ajouté au panier!",
+      });
+    } catch (error) {
+      console.log("Error adding product to cart:", error);
+      Toast.show({
+        type: "error",
+        text1: "Erreur lors de l'ajout du produit au panier",
+      });
+    }
+  };
+
   return (
     <ScrollView style={styles.container}>
       <Image source={{ uri: product.image_path }} style={styles.image} />
       <View style={styles.content}>
         <Text style={styles.name}>{product.name}</Text>
-        <Text style={styles.price}>${product.price.toFixed(2)}</Text>
+        <Text style={styles.price}>${product.price}</Text>
         <Text style={styles.description}>{product.description}</Text>
-        <Text style={styles.date}>
-          Créé le : {new Date(product.created_at).toLocaleDateString()}
-        </Text>
-        <Text style={styles.date}>
-          Mis à jour le : {new Date(product.updated_at).toLocaleDateString()}
-        </Text>
         <View style={styles.buttonContainer}>
-          <Button
-            title="Ajouter au panier"
-            onPress={() => {
-              /* ...ajouter au panier logistique... */
-            }}
-          />
+          <Button title="Ajouter au panier" onPress={addToCart} />
         </View>
       </View>
+      <Toast />
     </ScrollView>
   );
 }
@@ -48,7 +69,7 @@ export default function ProductDetail() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f2f2f2",
+    backgroundColor: Colors.lightGray,
   },
   image: {
     width: "100%",
@@ -64,13 +85,13 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 22,
     fontWeight: "700",
-    color: "#333",
+    color: Colors.primary,
     marginBottom: 8,
   },
   price: {
     fontSize: 20,
     fontWeight: "600",
-    color: "#e67e22",
+    color: Colors.secondary,
     marginBottom: 12,
   },
   description: {
@@ -78,11 +99,7 @@ const styles = StyleSheet.create({
     color: "#666",
     marginBottom: 12,
   },
-  date: {
-    fontSize: 12,
-    color: "#999",
-    marginBottom: 4,
-  },
+
   buttonContainer: {
     marginTop: 15,
   },

@@ -8,7 +8,9 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Colors } from "../../../constants/Colors";
+import { useNavigation } from "@react-navigation/native";
 export default function HomeScreen() {
+  const navigation = useNavigation();
   const featureList = [
     {
       key: "freeShipping",
@@ -58,7 +60,12 @@ export default function HomeScreen() {
         style={styles.image}
       />
 
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => {
+          navigation.navigate("Shop");
+        }}
+      >
         <Image
           source={require("../../assets/button.png")}
           style={StyleSheet.absoluteFill}
@@ -104,7 +111,7 @@ const styles = StyleSheet.create({
     color: "white",
   },
   productsText: {
-    color: "#FF6B00",
+    color: Colors.secondary,
     fontWeight: "600",
     fontSize: 27,
     textAlign: "center",
@@ -129,7 +136,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   buttonText: {
-    color: "#FF6B00",
+    color: Colors.secondary,
     fontWeight: "700",
     fontSize: 15,
     textAlign: "center",
@@ -153,7 +160,7 @@ const styles = StyleSheet.create({
   feText: {
     textAlign: "center",
     fontWeight: "900",
-    color: "#FF6B00",
+    color: Colors.secondary,
     fontSize: 14,
     borderRadius: 2,
     padding: 4,

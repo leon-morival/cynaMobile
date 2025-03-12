@@ -3,6 +3,7 @@ import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { Category, SubscriptionOffer } from "../../models/Entities";
 import CategoryCard from "../../components/Categories/CategoryCard";
 import ProductCard from "../../components/Products/ProductCard";
+import { Colors } from "../../../constants/Colors";
 
 export default function ShoppingScreen() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -32,7 +33,7 @@ export default function ShoppingScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.header}>Categories</Text>
+      {/* <Text style={styles.header}>Categories</Text> */}
       {categories.map((category) => (
         <View key={category.id} style={styles.categoryContainer}>
           <CategoryCard category={category} />
@@ -49,8 +50,9 @@ export default function ShoppingScreen() {
 
 const styles = StyleSheet.create({
   container: {
+    paddingTop: 35,
     flex: 1,
-    backgroundColor: "#f2f2f2",
+    backgroundColor: Colors.primary,
   },
   header: {
     fontSize: 24,
@@ -60,7 +62,7 @@ const styles = StyleSheet.create({
   },
   categoryContainer: {
     margin: 10,
-    backgroundColor: "#fff",
+    backgroundColor: Colors.lightGray,
     borderRadius: 8,
     padding: 10,
     shadowColor: "#000",

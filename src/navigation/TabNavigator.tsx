@@ -6,6 +6,7 @@ import HomeScreen from "../screens/Home/HomeScreen";
 import ShopStackNavigator from "./ShopStackNavigator";
 import SettingsScreen from "../screens/Settings/SettingsScreen";
 import CartScreen from "../screens/Cart/CartScreen";
+import { Colors } from "../../constants/Colors";
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
@@ -17,23 +18,24 @@ const TabNavigator = () => {
 
           if (route.name === "Home") {
             iconName = focused ? "home" : "home-outline";
-          } else if (route.name === "Profile") {
-            iconName = focused ? "person" : "person-outline";
+          } else if (route.name === "Shop") {
+            // changé: icône de 'person' modifiée pour une icône de shopping
+            iconName = focused ? "basket" : "basket-outline";
           } else if (route.name === "Cart") {
-            iconName = focused ? "settings" : "settings-outline";
+            iconName = focused ? "cart" : "cart-outline"; // changed from settings to cart
           } else if (route.name === "Settings") {
             iconName = focused ? "settings" : "settings-outline";
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: "#007AFF",
+        tabBarActiveTintColor: Colors.secondary,
         tabBarInactiveTintColor: "gray",
         headerShown: false,
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Profile" component={ShopStackNavigator} />
+      <Tab.Screen name="Shop" component={ShopStackNavigator} />
       <Tab.Screen name="Cart" component={CartScreen} />
       <Tab.Screen name="Settings" component={SettingsScreen} />
     </Tab.Navigator>

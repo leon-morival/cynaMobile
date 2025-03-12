@@ -1,6 +1,5 @@
 export const Colors = {
   primary: "#302082",
   secondary: "#FF5733",
-  tertiary: "#33FFBD",
-  quaternary: "#FFC133",
+  lightGray: "#F2F2F2",
 };
