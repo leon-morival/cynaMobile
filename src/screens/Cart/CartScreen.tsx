@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
   },
   productContainer: {
     padding: 10,
-    paddingBottom: 140, // pour laisser de la place pour la bottomBar
+    paddingBottom: 140,
   },
   headerTitle: {
     fontWeight: "900",
@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: "#c8c8c8",
+    backgroundColor: Colors.lightGray,
     padding: 10,
     alignItems: "center",
     paddingVertical: 40,
@@ -290,12 +290,12 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   labelTotal: {
-    color: "#fff",
+    color: Colors.primary,
     fontSize: 20,
     fontWeight: "600",
   },
   priceTotal: {
-    color: "#fff",
+    color: Colors.primary,
     fontSize: 20,
     fontWeight: "600",
   },
