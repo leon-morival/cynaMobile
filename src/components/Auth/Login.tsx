@@ -38,6 +38,7 @@ const Login = () => {
       setToken(data.token);
       if (data.user) {
         setUser(data.user);
+        await AsyncStorage.setItem("user", JSON.stringify(data.user));
       }
       Toast.show({
         type: "success",
@@ -88,6 +89,7 @@ const Login = () => {
       <TouchableOpacity style={styles.button} onPress={loginHandler}>
         <Text style={styles.buttonText}>Se connecter</Text>
       </TouchableOpacity>
+      <Toast />
     </View>
   );
 };

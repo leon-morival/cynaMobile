@@ -29,9 +29,7 @@ export default function CartScreen() {
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const [loading, setLoading] = useState(false);
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [token, setToken] = useState(
-    "5|D2q0d29ZgSx8hvjuRa8dTmXiW2boNX9p97nz8oJL60761c0d"
-  );
+  const [token, setToken] = useState<string | null>(null);
 
   // Load cart items and token when component mounts
   useEffect(() => {
@@ -41,17 +39,17 @@ export default function CartScreen() {
         "pk_test_51Ny7JaHVnu49ZpSn2I9HIRbRQeJqmf4Ttz3EscQuyFBYDdsTFFd7xgleXcIM8ognR3BG4sdV1Mfq7iC3hVpheYG700Ay6HrQsk", // replace with your actual publishable key
     });
     loadCartData();
-    // getToken();
+    getToken();
   }, []);
 
-  // const getToken = async () => {
-  //   try {
-  //     const userToken = await AsyncStorage.getItem("userToken");
-  //     setToken(userToken);
-  //   } catch (error) {
-  //     console.log("Error fetching token:", error);
-  //   }
-  // };
+  const getToken = async () => {
+    try {
+      const userToken = await AsyncStorage.getItem("token");
+      setToken(userToken);
+    } catch (error) {
+      console.log("Error fetching token:", error);
+    }
+  };
 
   const loadCartData = async () => {
     try {
@@ -229,9 +227,6 @@ export default function CartScreen() {
             <Text style={styles.commandButtonText}>Commander</Text>
           )}
         </TouchableOpacity>
-        {/* <Text style={styles.paymentMethods}>
-          Moyens de paiement: Stripe (Visa, Mastercard, etc.)
-        </Text> */}
       </View>
       <Toast />
     </View>

@@ -60,6 +60,7 @@ const Register = () => {
       }
       if (data.user) {
         setUser(data.user);
+        await AsyncStorage.setItem("user", JSON.stringify(data.user));
       }
       Toast.show({
         type: "success",

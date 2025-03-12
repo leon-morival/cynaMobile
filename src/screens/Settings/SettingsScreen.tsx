@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import Toast from "react-native-toast-message";
 import Login from "../../components/Auth/Login";
@@ -6,14 +6,24 @@ import Register from "../../components/Auth/Register";
 import { Colors } from "../../../constants/Colors";
 import { User } from "../../models/Entities";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
 const SettingsScreen = () => {
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [selectedForm, setSelectedForm] = useState<"login" | "register">(
     "login"
   );
+
+  useEffect(() => {
+    AsyncStorage.getItem("token").then((t) => setToken(t));
+    AsyncStorage.getItem("user").then((u) => {
+      if (u) setUser(JSON.parse(u));
+    });
+  }, []);
+
   const logoutHandler = async () => {
     await AsyncStorage.removeItem("token");
+    await AsyncStorage.removeItem("user");
     setToken(null);
     setUser(null);
     Toast.show({
@@ -22,6 +32,7 @@ const SettingsScreen = () => {
       text2: "Vous êtes déconnecté",
     });
   };
+
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Settings</Text>

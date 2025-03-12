@@ -58,7 +58,11 @@ export default function ProductDetail() {
         <Text style={styles.price}>${product.price}</Text>
         <Text style={styles.description}>{product.description}</Text>
         <View style={styles.buttonContainer}>
-          <Button title="Ajouter au panier" onPress={addToCart} />
+          <Button
+            title="Ajouter au panier"
+            onPress={addToCart}
+            color={Colors.primary}
+          />
         </View>
       </View>
       <Toast />
@@ -102,5 +106,6 @@ const styles = StyleSheet.create({
 
   buttonContainer: {
     marginTop: 15,
+    // backgroundColor: Colors.primary,
   },
 });
