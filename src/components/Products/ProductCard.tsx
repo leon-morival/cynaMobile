@@ -1,48 +1,69 @@
 import React from "react";
-import { TouchableOpacity, Image, Text, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { SubscriptionOffer } from "../../models/Entities";
 
-interface Product {
-  id: number;
-  name: string;
-  image_path: string;
-  min_price: number;
+interface ProductCardProps {
+  offer: SubscriptionOffer;
 }
 
-interface Props {
-  product: Product;
-}
+const ProductCard: React.FC<ProductCardProps> = ({ offer }) => {
+  const navigation = useNavigation<any>();
 
-export default function ProductCard({ product }: Props) {
   return (
-    <TouchableOpacity style={styles.productCard}>
-      <Image source={{ uri: product.image_path }} style={styles.productImage} />
-      <Text style={styles.productText}>{product.name}</Text>
-      <Text style={styles.productText}>${product.min_price.toFixed(2)}</Text>
+    <TouchableOpacity
+      onPress={() => navigation.navigate("ProductDetail", { product: offer })}
+    >
+      <View style={styles.card}>
+        <Image source={{ uri: offer.image_path }} style={styles.image} />
+        <View style={styles.info}>
+          <Text style={styles.name}>{offer.name}</Text>
+          <Text style={styles.price}>${offer.price.toFixed(2)}</Text>
+          <Text style={styles.description} numberOfLines={2}>
+            {offer.description}
+          </Text>
+        </View>
+      </View>
     </TouchableOpacity>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  productCard: {
-    width: "48%",
-    backgroundColor: "#e8f4fc",
+  card: {
+    flexDirection: "row",
+    backgroundColor: "#fff",
     borderRadius: 8,
-    marginBottom: 16,
-    alignItems: "center",
-    padding: 8,
+    overflow: "hidden",
+    marginVertical: 5,
     shadowColor: "#000",
     shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 8,
     elevation: 2,
   },
-  productImage: {
-    width: "100%",
+  image: {
+    width: 100,
     height: 100,
-    borderRadius: 8,
-    marginBottom: 8,
   },
-  productText: {
+  info: {
+    flex: 1,
+    padding: 10,
+  },
+  name: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+  },
+  price: {
     fontSize: 14,
     fontWeight: "500",
+    color: "#e67e22",
+    marginVertical: 4,
+  },
+  description: {
+    fontSize: 12,
+    color: "#666",
   },
 });
+
+export default ProductCard;

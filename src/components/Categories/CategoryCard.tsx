@@ -1,46 +1,46 @@
 import React from "react";
-import { TouchableOpacity, Image, Text, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet } from "react-native";
+import { Category } from "../../models/Entities";
 
-interface Category {
-  id: number;
-  name: string;
-  image_path: string;
-}
-
-interface Props {
+interface CategoryCardProps {
   category: Category;
-  onPress: () => void;
 }
 
-export default function CategoryCard({ category, onPress }: Props) {
+const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress}>
-      <Image source={{ uri: category.image_path }} style={styles.cardImage} />
-      <Text style={styles.cardText}>{category.name}</Text>
-    </TouchableOpacity>
+    <View style={styles.card}>
+      {category.image_path ? (
+        <Image source={{ uri: category.image_path }} style={styles.image} />
+      ) : null}
+      <Text style={styles.title}>{category.name}</Text>
+    </View>
   );
-}
+};
+
 const styles = StyleSheet.create({
   card: {
-    width: "48%",
-    backgroundColor: "#f8f8f8",
+    backgroundColor: "#fff",
+    padding: 10,
     borderRadius: 8,
-    marginBottom: 16,
+    marginVertical: 5,
     alignItems: "center",
-    padding: 8,
     shadowColor: "#000",
     shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 8,
     elevation: 2,
   },
-  cardImage: {
-    width: "100%",
-    height: 100,
-    borderRadius: 8,
+  image: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     marginBottom: 8,
   },
-  cardText: {
-    fontSize: 16,
-    fontWeight: "500",
+  title: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#333",
   },
 });
+
+export default CategoryCard;

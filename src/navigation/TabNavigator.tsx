@@ -5,7 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import HomeScreen from "../screens/Home/HomeScreen";
 import ShopStackNavigator from "./ShopStackNavigator";
 import SettingsScreen from "../screens/Settings/SettingsScreen";
-
+import CartScreen from "../screens/Cart/CartScreen";
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
@@ -19,6 +19,8 @@ const TabNavigator = () => {
             iconName = focused ? "home" : "home-outline";
           } else if (route.name === "Profile") {
             iconName = focused ? "person" : "person-outline";
+          } else if (route.name === "Cart") {
+            iconName = focused ? "settings" : "settings-outline";
           } else if (route.name === "Settings") {
             iconName = focused ? "settings" : "settings-outline";
           }
@@ -32,6 +34,7 @@ const TabNavigator = () => {
     >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Profile" component={ShopStackNavigator} />
+      <Tab.Screen name="Cart" component={CartScreen} />
       <Tab.Screen name="Settings" component={SettingsScreen} />
     </Tab.Navigator>
   );
