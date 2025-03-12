@@ -6,6 +6,27 @@ export interface Category {
   updated_at: string;
 }
 
+export enum Civilite {
+  MR = "MR",
+  MME = "MME",
+  ENT = "ENT",
+  AUT = "AUT",
+}
+
+export enum Role {
+  ADMIN = "ADMIN",
+  USER = "USER",
+}
+
+export interface User {
+  id: number;
+  email: string;
+  civilite: Civilite;
+  siret?: string;
+  role: Role;
+  created_at: string;
+  updated_at: string;
+}
 export interface SubscriptionOffer {
   id: number;
   name: string;
