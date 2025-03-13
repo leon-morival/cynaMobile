@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
 import { Category } from "../../models/Entities";
+import { Colors } from "../../../constants/Colors";
 
 interface CategoryCardProps {
   category: Category;
@@ -8,38 +9,64 @@ interface CategoryCardProps {
 
 const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
   return (
-    <View style={styles.card}>
+    <View style={styles.categoryHeader}>
       {category.image_path ? (
         <Image source={{ uri: category.image_path }} style={styles.image} />
-      ) : null}
-      <Text style={styles.title}>{category.name}</Text>
+      ) : (
+        <View style={styles.imagePlaceholder}>
+          <Text style={styles.placeholderText}>{category.name.charAt(0)}</Text>
+        </View>
+      )}
+      <View style={styles.titleContainer}>
+        <Text style={styles.title}>{category.name}</Text>
+        <View style={styles.underline} />
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: "#fff",
-    padding: 10,
-    borderRadius: 8,
-    marginVertical: 5,
+  categoryHeader: {
+    flexDirection: "row",
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 8,
-    elevation: 2,
+    paddingVertical: 10,
   },
   image: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    marginBottom: 8,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 15,
+    borderWidth: 2,
+    borderColor: Colors.primary,
+  },
+  imagePlaceholder: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 15,
+    backgroundColor: Colors.primary,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  placeholderText: {
+    color: "white",
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  titleContainer: {
+    flex: 1,
   },
   title: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#333",
+    fontSize: 20,
+    fontWeight: "700",
+    color: Colors.primary,
+    marginBottom: 5,
+  },
+  underline: {
+    height: 3,
+    width: 40,
+    backgroundColor: Colors.secondary,
+    borderRadius: 2,
   },
 });
 
