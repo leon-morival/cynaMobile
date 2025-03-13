@@ -1,13 +1,14 @@
-import React from "react";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import React from "react";
 
-import HomeScreen from "../screens/Home/HomeScreen";
-import ShopStackNavigator from "./ShopStackNavigator";
-import CartScreen from "../screens/Cart/CartScreen";
 import { Colors } from "../../constants/Colors";
-import SettingsStackNavigator from "./SettingsStackNavigator";
+import CartScreen from "../screens/Cart/CartScreen";
+import ChatBotScreen from "../screens/ChatBot/ChatBotScreen";
+import HomeStackNavigator from "./HomeStackNavigator";
 import { Routes } from "./Routes";
+import SettingsStackNavigator from "./SettingsStackNavigator";
+import ShopStackNavigator from "./ShopStackNavigator";
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
@@ -17,7 +18,7 @@ const TabNavigator = () => {
         tabBarIcon: ({ focused, color, size }) => {
           let iconName: any = "";
 
-          if (route.name === Routes.HomeScreen) {
+          if (route.name === Routes.HomeTab) {
             iconName = focused ? "home" : "home-outline";
           } else if (route.name === Routes.ShopTab) {
             // changé: icône de 'person' modifiée pour une icône de shopping
@@ -35,7 +36,7 @@ const TabNavigator = () => {
         headerShown: false,
       })}
     >
-      <Tab.Screen name={Routes.HomeScreen} component={HomeScreen} />
+      <Tab.Screen name={Routes.HomeTab} component={HomeStackNavigator} />
       <Tab.Screen name={Routes.ShopTab} component={ShopStackNavigator} />
       <Tab.Screen name={Routes.CartScreen} component={CartScreen} />
       <Tab.Screen

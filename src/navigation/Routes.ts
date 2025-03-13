@@ -8,6 +8,7 @@ export const CartTab = "Cart";
 export const SettingsTab = "Settings";
 export const HomeScreen = "HomeScreen";
 export const CartScreen = "CartScreen";
+export const ChatBot = "ChatBot";
 
 export const Routes = {
   ShoppingScreen,
@@ -20,4 +21,5 @@ export const Routes = {
   SettingsTab,
   HomeScreen,
   CartScreen,
+  ChatBot,
 };

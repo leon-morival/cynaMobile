@@ -128,10 +128,6 @@ export default function PasswordChange() {
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Modifier le mot de passe</Text>
-      </View>
-
       <View style={styles.formContainer}>
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Mot de passe actuel</Text>
@@ -214,6 +210,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   formContainer: {
+    justifyContent: "center",
+    // alignSelf: "center",
     backgroundColor: "#fff",
     borderRadius: 10,
     padding: 20,

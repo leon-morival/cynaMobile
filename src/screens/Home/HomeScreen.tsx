@@ -51,73 +51,91 @@ export default function HomeScreen() {
   ];
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Hero Section */}
-      <View style={styles.heroSection}>
-        <View style={styles.textContainer}>
-          <Text style={styles.valueDealsText}>Offre exclusive</Text>
-          <Text style={styles.productsText}>Sur tous nos produits</Text>
-          <Text style={styles.savingsText}>
-            Économisez plus avec nos coupons & jusqu'à 70% de réduction!
-          </Text>
+    <View style={styles.mainContainer}>
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        {/* Hero Section */}
+        <View style={styles.heroSection}>
+          <View style={styles.textContainer}>
+            <Text style={styles.valueDealsText}>Offre exclusive</Text>
+            <Text style={styles.productsText}>Sur tous nos produits</Text>
+            <Text style={styles.savingsText}>
+              Économisez plus avec nos coupons & jusqu'à 70% de réduction!
+            </Text>
+          </View>
+
+          <Image
+            source={require("../../assets/images/hero4.png")}
+            style={styles.heroImage}
+            resizeMode="contain"
+          />
+
+          <TouchableOpacity
+            style={styles.shopNowButton}
+            onPress={() => {
+              navigation.navigate("Shop" as never);
+            }}
+          >
+            <Text style={styles.buttonText}>Acheter maintenant</Text>
+            <Ionicons
+              name="arrow-forward"
+              size={20}
+              color={Colors.secondary}
+              style={styles.buttonIcon}
+            />
+          </TouchableOpacity>
         </View>
 
-        <Image
-          source={require("../../assets/images/hero4.png")}
-          style={styles.heroImage}
-          resizeMode="contain"
-        />
+        {/* Features Section */}
+        <View style={styles.sectionTitle}>
+          <Text style={styles.sectionTitleText}>Nos services</Text>
+        </View>
 
-        <TouchableOpacity
-          style={styles.shopNowButton}
-          onPress={() => {
-            navigation.navigate("Shop");
-          }}
-        >
-          <Text style={styles.buttonText}>Acheter maintenant</Text>
-          <Ionicons
-            name="arrow-forward"
-            size={20}
-            color={Colors.secondary}
-            style={styles.buttonIcon}
-          />
-        </TouchableOpacity>
-      </View>
-
-      {/* Features Section */}
-      <View style={styles.sectionTitle}>
-        <Text style={styles.sectionTitleText}>Nos services</Text>
-      </View>
-
-      <View style={styles.featureSection}>
-        {featureList.map((feature) => (
-          <View key={feature.key} style={styles.feBox}>
-            <View style={styles.feImageContainer}>
-              <Ionicons name={feature.icon} size={32} color={Colors.primary} />
+        <View style={styles.featureSection}>
+          {featureList.map((feature) => (
+            <View key={feature.key} style={styles.feBox}>
+              <View style={styles.feImageContainer}>
+                <Ionicons
+                  name={feature.icon}
+                  size={32}
+                  color={Colors.primary}
+                />
+              </View>
+              <Text style={styles.feText}>{feature.title}</Text>
             </View>
-            <Text style={styles.feText}>{feature.title}</Text>
-          </View>
-        ))}
-      </View>
+          ))}
+        </View>
 
-      {/* Call to action section */}
-      <View style={styles.ctaSection}>
-        <Text style={styles.ctaTitle}>Découvrez nos offres</Text>
-        <Text style={styles.ctaSubtitle}>
-          Des solutions adaptées à vos besoins
-        </Text>
-        <TouchableOpacity
-          style={styles.ctaButton}
-          onPress={() => navigation.navigate(Routes.ShopTab as never)}
-        >
-          <Text style={styles.ctaButtonText}>Explorer</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+        {/* Call to action section */}
+        <View style={styles.ctaSection}>
+          <Text style={styles.ctaTitle}>Découvrez nos offres</Text>
+          <Text style={styles.ctaSubtitle}>
+            Des solutions adaptées à vos besoins
+          </Text>
+          <TouchableOpacity
+            style={styles.ctaButton}
+            onPress={() => navigation.navigate(Routes.ShopTab as never)}
+          >
+            <Text style={styles.ctaButtonText}>Explorer</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+
+      {/* Chat Bot Floating Button */}
+      <TouchableOpacity
+        style={styles.chatBotButton}
+        onPress={() => navigation.navigate("ChatBot" as never)}
+      >
+        <Ionicons name="chatbubble-ellipses" size={28} color="white" />
+      </TouchableOpacity>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+    position: "relative",
+  },
   container: {
     backgroundColor: Colors.primary,
     flex: 1,
@@ -267,5 +285,22 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "600",
+  },
+  chatBotButton: {
+    position: "absolute",
+    bottom: 30,
+    right: 20,
+    backgroundColor: Colors.secondary,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    zIndex: 999,
   },
 });

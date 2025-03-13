@@ -87,13 +87,14 @@ export default function Profile({ user }: ProfileProps) {
               style={styles.rowIcon}
             />
             <Text style={styles.infoValue}>
+              Date de création : &nbsp;
               {new Date(user.created_at).toLocaleDateString("fr-FR")}
             </Text>
           </View>
 
           {/* Redirection vers l'écran de modification du mot de passe */}
           <TouchableOpacity
-            style={styles.infoRow}
+            style={[styles.infoRow, styles.passwordChangeRow]}
             onPress={handlePasswordChange}
           >
             <Ionicons
@@ -141,6 +142,10 @@ const styles = StyleSheet.create({
     borderBottomColor: "#f0f0f0",
     paddingBottom: 8,
     alignItems: "center",
+  },
+  passwordChangeRow: {
+    marginBottom: -8,
+    borderBottomWidth: 0,
   },
   infoLabel: {
     fontWeight: "bold",
