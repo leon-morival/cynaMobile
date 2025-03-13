@@ -41,7 +41,7 @@ export default function CartScreen() {
     loadCartData();
     getToken();
   }, []);
-
+  console.log("token", token);
   const getToken = async () => {
     try {
       const userToken = await AsyncStorage.getItem("token");
@@ -129,18 +129,24 @@ export default function CartScreen() {
   };
 
   const handlePayPress = async () => {
+    // Add token check before processing payment
+    if (!token) {
+      Toast.show({
+        type: "error",
+        text1: "Veuillez vous connecter avant de commander",
+      });
+      return;
+    }
+
     // Initialize payment sheet if not already initialized
     const { error: initError } = await initializePaymentSheet();
-
     if (initError) {
       console.log("Initialization error:", initError);
       return;
     }
-
     // Present the payment sheet
     const { error } = await presentPaymentSheet();
     console.log("Payment sheet presented. Error from sheet:", error);
-
     if (error) {
       Toast.show({
         type: "error",

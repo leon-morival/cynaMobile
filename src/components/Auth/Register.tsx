@@ -76,22 +76,6 @@ const Register = () => {
     }
   };
 
-  if (token) {
-    return (
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Profile</Text>
-        {user ? (
-          <>
-            <Text>Email: {user.email}</Text>
-            <Text>Civilité: {user.civilite}</Text>
-          </>
-        ) : (
-          <Text>Chargement des informations...</Text>
-        )}
-      </View>
-    );
-  }
-
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>Register</Text>
@@ -112,10 +96,10 @@ const Register = () => {
         selectedValue={registerCivilite}
         onValueChange={(itemValue) => setRegisterCivilite(itemValue)}
       >
-        <Picker.Item label="MR" value={Civilite.MR} />
-        <Picker.Item label="MME" value={Civilite.MME} />
-        <Picker.Item label="ENT" value={Civilite.ENT} />
-        <Picker.Item label="AUT" value={Civilite.AUT} />
+        <Picker.Item label="Monsieur" value={Civilite.MR} />
+        <Picker.Item label="Madame" value={Civilite.MME} />
+        <Picker.Item label="Entreprise" value={Civilite.ENT} />
+        <Picker.Item label="Autres" value={Civilite.AUT} />
       </Picker>
       <AuthInput
         type="password"

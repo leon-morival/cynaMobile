@@ -19,11 +19,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<any>(null);
 
+  // Load token on mount
   useEffect(() => {
     AsyncStorage.getItem("token").then((storedToken) => {
       if (storedToken) setToken(storedToken);
     });
   }, []);
+
+  useEffect(() => {
+    if (token) {
+      AsyncStorage.getItem("user").then((storedUser) => {
+        if (storedUser) setUser(JSON.parse(storedUser));
+      });
+    }
+  }, [token]);
 
   return (
     <AuthContext.Provider value={{ token, setToken, user, setUser }}>
