@@ -11,36 +11,48 @@ import {
 import { useStripe, initStripe } from "@stripe/stripe-react-native";
 import { createPaymentIntent } from "../../../services/paymentService";
 import Toast from "react-native-toast-message";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Colors } from "../../../constants/Colors";
+import { Ionicons } from "@expo/vector-icons";
+import { Dropdown } from "react-native-element-dropdown";
 
 import { SubscriptionOffer } from "../../models/Entities";
 
 // Add a new type for cart items based on SubscriptionOffer
-type CartItem = SubscriptionOffer & {
-  quantity: number;
-  type: string;
-  url: string;
-};
+type SubscriptionType = "monthly" | "annual";
+
+// Create data for the dropdown
+const subscriptionTypeData = [
+  { label: "Mensuel", value: "monthly" },
+  { label: "Annuel", value: "annual" },
+];
 
 export default function CartScreen() {
   const navigation = useNavigation();
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const [loading, setLoading] = useState(false);
-  const [cart, setCart] = useState<CartItem[]>([]);
+  const [cart, setCart] = useState<SubscriptionOffer[]>([]);
   const [token, setToken] = useState<string | null>(null);
+  const [subscriptionTypes, setSubscriptionTypes] = useState<{
+    [key: number]: SubscriptionType;
+  }>({});
 
-  // Load cart items and token when component mounts
-  useEffect(() => {
-    // Initialize Stripe Configuration
-    initStripe({
-      publishableKey:
-        "pk_test_51Ny7JaHVnu49ZpSn2I9HIRbRQeJqmf4Ttz3EscQuyFBYDdsTFFd7xgleXcIM8ognR3BG4sdV1Mfq7iC3hVpheYG700Ay6HrQsk", // replace with your actual publishable key
-    });
-    loadCartData();
-    getToken();
-  }, []);
+  // Replace useEffect with useFocusEffect to update cart and token on screen focus
+  useFocusEffect(
+    React.useCallback(() => {
+      // Initialize Stripe Configuration only once if needed
+      initStripe({
+        publishableKey:
+          "pk_test_51Ny7JaHVnu49ZpSn2I9HIRbRQeJqmf4Ttz3EscQuyFBYDdsTFFd7xgleXcIM8ognR3BG4sdV1Mfq7iC3hVpheYG700Ay6HrQsk",
+      });
+      loadCartData();
+      getToken();
+      // Cleanup if necessary
+      return () => {};
+    }, [])
+  );
+
   console.log("token", token);
   const getToken = async () => {
     try {
@@ -55,7 +67,15 @@ export default function CartScreen() {
     try {
       const storedCart = await AsyncStorage.getItem("cart");
       if (storedCart !== null) {
-        setCart(JSON.parse(storedCart));
+        const parsedCart = JSON.parse(storedCart);
+        setCart(parsedCart);
+
+        // Initialize subscription types to monthly for all items
+        const types: { [key: number]: SubscriptionType } = {};
+        parsedCart.forEach((item: SubscriptionOffer) => {
+          types[item.id] = "monthly";
+        });
+        setSubscriptionTypes(types);
       } else {
         setCart([]);
       }
@@ -64,10 +84,21 @@ export default function CartScreen() {
     }
   };
 
-  const totalAmount = cart.reduce(
-    (acc, item) => acc + item.price * item.quantity,
-    0
-  );
+  const totalAmount = cart.reduce((acc, item) => {
+    // Apply 10x multiplier for annual subscriptions
+    const multiplier = subscriptionTypes[item.id] === "annual" ? 10 : 1;
+    return acc + item.price * item.quantity * multiplier;
+  }, 0);
+
+  const handleSubscriptionTypeChange = (
+    itemId: number,
+    type: SubscriptionType
+  ) => {
+    setSubscriptionTypes((prev) => ({
+      ...prev,
+      [itemId]: type,
+    }));
+  };
 
   const initializePaymentSheet = async () => {
     try {
@@ -187,6 +218,20 @@ export default function CartScreen() {
     }
   };
 
+  // New function: update cart item quantity and remove if quantity <= 0
+  const updateCartItem = async (itemId: number, newQuantity: number) => {
+    const updatedCart = cart
+      .map((item) =>
+        item.id === itemId ? { ...item, quantity: newQuantity } : item
+      )
+      .filter((item) => item.quantity > 0);
+    setCart(updatedCart);
+    await AsyncStorage.setItem("cart", JSON.stringify(updatedCart));
+  };
+  const handleDelete = (itemId: number) => {
+    updateCartItem(itemId, 0);
+  };
+
   if (cart.length === 0) {
     return (
       <View style={styles.emptyContainer}>
@@ -207,20 +252,51 @@ export default function CartScreen() {
         <Text style={styles.headerTitle}>Mon panier</Text>
         {cart.map((item) => (
           <View key={item.id} style={styles.productItem}>
-            <Image source={{ uri: item.url }} style={styles.productImage} />
+            <Image
+              source={{ uri: item.image_path }}
+              style={styles.productImage}
+            />
             <View style={styles.productDetails}>
               <Text style={styles.productName}>{item.name}</Text>
-              <Text style={styles.productDetail}>Prix: {item.price} €</Text>
-              <Text style={styles.productDetail}>Type: {item.type}</Text>
-              <Text style={styles.productDetail}>Qté: {item.quantity}</Text>
+              <Text style={styles.productDetail}>
+                Prix:{" "}
+                {(
+                  item.price *
+                  (subscriptionTypes[item.id] === "annual" ? 10 : 1)
+                ).toFixed(2)}{" "}
+                €
+              </Text>
+              <View style={styles.subscriptionTypeContainer}>
+                <Text style={styles.productDetail}>Type: </Text>
+                <Dropdown
+                  style={styles.dropdown}
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  data={subscriptionTypeData}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  placeholder="Choisir"
+                  value={subscriptionTypes[item.id] || "monthly"}
+                  onChange={(selectedItem) => {
+                    handleSubscriptionTypeChange(
+                      item.id,
+                      selectedItem.value as SubscriptionType
+                    );
+                  }}
+                />
+              </View>
             </View>
+            <TouchableOpacity onPress={() => handleDelete(item.id)}>
+              <Ionicons name="trash" size={24} color="red" />
+            </TouchableOpacity>
           </View>
         ))}
       </ScrollView>
       <View style={styles.bottomBar}>
         <View style={styles.totalRow}>
           <Text style={styles.labelTotal}>Total:</Text>
-          <Text style={styles.priceTotal}>{totalAmount} €</Text>
+          <Text style={styles.priceTotal}>{totalAmount.toFixed(2)} €</Text>
         </View>
         <TouchableOpacity
           style={styles.commandButton}
@@ -350,5 +426,60 @@ const styles = StyleSheet.create({
     color: "#fff",
     textAlign: "center",
     fontWeight: "500",
+  },
+  quantityControls: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 5,
+  },
+  controlButton: {
+    fontSize: 20,
+    fontWeight: "600",
+    marginHorizontal: 10,
+    color: Colors.primary,
+  },
+  quantityText: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#000",
+  },
+  deleteButton: {
+    marginLeft: 15,
+    fontSize: 16,
+    color: "red",
+  },
+  dropdown: {
+    width: 120,
+    height: 36,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    paddingHorizontal: 8,
+  },
+  placeholderStyle: {
+    fontSize: 12,
+    color: "#555",
+  },
+  selectedTextStyle: {
+    fontSize: 12,
+    color: "#000",
+  },
+  subscriptionTypeContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 5,
+  },
+  pickerContainer: {
+    display: "none",
+  },
+  picker: {
+    display: "none",
+  },
+  pickerItem: {
+    display: "none",
+  },
+  pickerItemText: {
+    display: "none",
   },
 });

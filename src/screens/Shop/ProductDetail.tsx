@@ -26,6 +26,16 @@ export default function ProductDetail() {
     try {
       const storedCart = await AsyncStorage.getItem("cart");
       const currentCart = storedCart ? JSON.parse(storedCart) : [];
+      // If product is already in cart, do not add it again
+      const exists = currentCart.find((item: any) => item.id === product.id);
+      if (exists) {
+        Toast.show({
+          type: "info",
+          text1:
+            "Produit déjà présent dans le panier. Modifiez la quantité dans le panier!",
+        });
+        return;
+      }
       // Map the product to the cart item structure
       const newItem = {
         id: product.id,
