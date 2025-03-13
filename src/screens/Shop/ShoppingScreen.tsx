@@ -4,7 +4,7 @@ import { Category, SubscriptionOffer } from "../../models/Entities";
 import CategoryCard from "../../components/Categories/CategoryCard";
 import ProductCard from "../../components/Products/ProductCard";
 import { Colors } from "../../../constants/Colors";
-
+import { API_URL } from "../../../constants/api";
 export default function ShoppingScreen() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [subscriptionOffers, setSubscriptionOffers] = useState<
@@ -14,15 +14,11 @@ export default function ShoppingScreen() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const catResponse = await fetch(
-          "https://api.leonmorival.xyz/api/categories"
-        );
+        const catResponse = await fetch(`${API_URL}/categories`);
         const catData = await catResponse.json();
         // Changed: extract categories from 'member' property.
         setCategories(catData.member);
-        const offerResponse = await fetch(
-          "https://api.leonmorival.xyz/api/subscription-offers"
-        );
+        const offerResponse = await fetch(`${API_URL}/subscription-offers`);
         const offerData: SubscriptionOffer[] = await offerResponse.json();
         // console.log("offerData", offerData);
         setSubscriptionOffers(offerData);

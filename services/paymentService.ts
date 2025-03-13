@@ -1,3 +1,4 @@
+import { API_URL } from "../constants/api";
 interface PaymentIntentResponse {
   clientSecret: string;
 }
@@ -7,20 +8,17 @@ export async function createPaymentIntent(
   token: string
 ): Promise<PaymentIntentResponse> {
   try {
-    const response = await fetch(
-      "https://api.leonmorival.xyz/api/create-payment-intent",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // updated to use dynamic token
-        },
-        body: JSON.stringify({
-          amount: amount * 100,
-          currency: "eur",
-        }),
-      }
-    );
+    const response = await fetch(`${API_URL}/create-payment-intent`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // updated to use dynamic token
+      },
+      body: JSON.stringify({
+        amount: amount * 100,
+        currency: "eur",
+      }),
+    });
 
     if (!response.ok) {
       const errorText = await response.text();

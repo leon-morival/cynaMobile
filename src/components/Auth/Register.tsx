@@ -7,7 +7,7 @@ import { Civilite } from "../../models/Entities";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContext } from "../../context/AuthContext";
 
-const BASE_URL = "https://api.leonmorival.xyz/api";
+import { API_URL } from "../../../constants/api";
 
 const Register = () => {
   const [registerName, setRegisterName] = useState("");
@@ -37,7 +37,7 @@ const Register = () => {
       if (registerCivilite === Civilite.ENT) {
         body.siret = registerSiret;
       }
-      const response = await fetch(`${BASE_URL}/register`, {
+      const response = await fetch(`${API_URL}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

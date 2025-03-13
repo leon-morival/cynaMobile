@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   View,
@@ -8,19 +8,20 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import { useStripe, initStripe } from "@stripe/stripe-react-native";
-import { createPaymentIntent } from "../../../services/paymentService";
+import { initStripe } from "@stripe/stripe-react-native";
+import { createClientSubscription } from "../../../services/subscriptionService";
+import {
+  createOrder,
+  prepareClientSubscriptions,
+} from "../../../services/orderService";
 import Toast from "react-native-toast-message";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Colors } from "../../../constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { Dropdown } from "react-native-element-dropdown";
-
-import { SubscriptionOffer } from "../../models/Entities";
-
-// Add a new type for cart items based on SubscriptionOffer
-type SubscriptionType = "monthly" | "annual";
+import { useCart, SubscriptionType } from "../../hooks/useCart";
+import { usePayment } from "../../hooks/usePayment";
 
 // Create data for the dropdown
 const subscriptionTypeData = [
@@ -30,13 +31,19 @@ const subscriptionTypeData = [
 
 export default function CartScreen() {
   const navigation = useNavigation();
-  const { initPaymentSheet, presentPaymentSheet } = useStripe();
-  const [loading, setLoading] = useState(false);
-  const [cart, setCart] = useState<SubscriptionOffer[]>([]);
   const [token, setToken] = useState<string | null>(null);
-  const [subscriptionTypes, setSubscriptionTypes] = useState<{
-    [key: number]: SubscriptionType;
-  }>({});
+
+  const {
+    cart,
+    subscriptionTypes,
+    loadCartData,
+    updateSubscriptionType,
+    deleteCartItem,
+    calculateTotalAmount,
+    clearCart,
+  } = useCart();
+
+  const { loading, handlePayment } = usePayment();
 
   // Replace useEffect with useFocusEffect to update cart and token on screen focus
   useFocusEffect(
@@ -53,114 +60,18 @@ export default function CartScreen() {
     }, [])
   );
 
-  console.log("token", token);
   const getToken = async () => {
     try {
       const userToken = await AsyncStorage.getItem("token");
       setToken(userToken);
     } catch (error) {
-      console.log("Error fetching token:", error);
+      // Silent error
     }
   };
 
-  const loadCartData = async () => {
-    try {
-      const storedCart = await AsyncStorage.getItem("cart");
-      if (storedCart !== null) {
-        const parsedCart = JSON.parse(storedCart);
-        setCart(parsedCart);
+  const totalAmount = calculateTotalAmount();
 
-        // Initialize subscription types to monthly for all items
-        const types: { [key: number]: SubscriptionType } = {};
-        parsedCart.forEach((item: SubscriptionOffer) => {
-          types[item.id] = "monthly";
-        });
-        setSubscriptionTypes(types);
-      } else {
-        setCart([]);
-      }
-    } catch (error) {
-      console.log("Error loading cart from storage:", error);
-    }
-  };
-
-  const totalAmount = cart.reduce((acc, item) => {
-    // Apply 10x multiplier for annual subscriptions
-    const multiplier = subscriptionTypes[item.id] === "annual" ? 10 : 1;
-    return acc + item.price * item.quantity * multiplier;
-  }, 0);
-
-  const handleSubscriptionTypeChange = (
-    itemId: number,
-    type: SubscriptionType
-  ) => {
-    setSubscriptionTypes((prev) => ({
-      ...prev,
-      [itemId]: type,
-    }));
-  };
-
-  const initializePaymentSheet = async () => {
-    try {
-      setLoading(true);
-
-      if (!token) {
-        Toast.show({
-          type: "error",
-          text1: "Erreur",
-          text2: "Vous devez être connecté pour effectuer un paiement.",
-        });
-        setLoading(false);
-        return { error: new Error("Token manquant") };
-      }
-
-      // Get payment intent from your backend
-      const { clientSecret } = await createPaymentIntent(totalAmount, token);
-      // Added check for invalid clientSecret (or invalid token)
-      if (!clientSecret) {
-        Toast.show({
-          type: "error",
-          text1: "Erreur",
-          text2:
-            "Token invalide ou erreur lors de la récupération du paiement.",
-        });
-        setLoading(false);
-        return { error: new Error("Token invalide ou clientSecret manquant") };
-      }
-      console.log("ClientSecret retrieved:", clientSecret);
-
-      // Initialize the Payment Sheet
-      const { error } = await initPaymentSheet({
-        paymentIntentClientSecret: clientSecret,
-        merchantDisplayName: "Cyna Store",
-        style: "alwaysLight",
-      });
-
-      if (error) {
-        console.log("Error initializing payment sheet:", error);
-        Toast.show({
-          type: "error",
-          text1: "Erreur",
-          text2: error.message,
-        });
-      }
-
-      setLoading(false);
-      return { error };
-    } catch (error) {
-      console.log("Error in initializePaymentSheet:", error);
-      Toast.show({
-        type: "error",
-        text1: "Erreur",
-        text2: "Impossible d'initialiser le système de paiement",
-      });
-      setLoading(false);
-      return { error };
-    }
-  };
-
-  const handlePayPress = async () => {
-    // Add token check before processing payment
+  const handleCheckout = async () => {
     if (!token) {
       Toast.show({
         type: "error",
@@ -169,27 +80,18 @@ export default function CartScreen() {
       return;
     }
 
-    // Initialize payment sheet if not already initialized
-    const { error: initError } = await initializePaymentSheet();
-    if (initError) {
-      console.log("Initialization error:", initError);
-      return;
-    }
-    // Present the payment sheet
-    const { error } = await presentPaymentSheet();
-    console.log("Payment sheet presented. Error from sheet:", error);
-    if (error) {
-      Toast.show({
-        type: "error",
-        text1: "Paiement échoué",
-        text2: error.message,
-      });
-    } else {
+    const { success } = await handlePayment(totalAmount, token);
+
+    if (success) {
+      // Create client subscriptions after successful payment
+      await createSubscriptionsAfterPayment();
+
       Toast.show({
         type: "success",
         text1: "Succès",
         text2: "Paiement effectué avec succès!",
       });
+
       // Clear the cart on successful payment
       await clearCart();
       // Reload cart data
@@ -197,39 +99,43 @@ export default function CartScreen() {
     }
   };
 
-  const clearCart = async () => {
+  // Function to create client subscriptions after payment
+  const createSubscriptionsAfterPayment = async () => {
+    if (!token || cart.length === 0) return;
+
     try {
-      if (!token) return;
+      // Prepare subscription data using the orderService
+      const subscriptionsToCreate = prepareClientSubscriptions(
+        cart,
+        subscriptionTypes
+      );
 
-      // Call your API to clear the cart
-      // await fetch("https://api.leonmorival.xyz/api/cart", {
-      //   method: "DELETE",
-      //   headers: {
-      //     "Authorization": `Bearer ${token}`,
-      //     "Content-Type": "application/json"
-      //   }
-      // });
+      const success = await createClientSubscription(
+        subscriptionsToCreate,
+        token
+      );
 
-      // For demo purposes, just clear the local state
-      await AsyncStorage.removeItem("cart");
-      setCart([]);
+      if (success) {
+        console.log("Client subscriptions created successfully");
+        // After successful subscription creation, create an order record
+        await createOrder(totalAmount, token);
+      } else {
+        console.error("Failed to create client subscriptions");
+        Toast.show({
+          type: "error",
+          text1: "Erreur",
+          text2:
+            "Paiement réussi mais problème lors de l'activation des abonnements",
+        });
+      }
     } catch (error) {
-      console.log("Error clearing cart:", error);
+      console.error("Error creating subscriptions:", error);
+      Toast.show({
+        type: "error",
+        text1: "Erreur",
+        text2: "Problème lors de l'activation des abonnements",
+      });
     }
-  };
-
-  // New function: update cart item quantity and remove if quantity <= 0
-  const updateCartItem = async (itemId: number, newQuantity: number) => {
-    const updatedCart = cart
-      .map((item) =>
-        item.id === itemId ? { ...item, quantity: newQuantity } : item
-      )
-      .filter((item) => item.quantity > 0);
-    setCart(updatedCart);
-    await AsyncStorage.setItem("cart", JSON.stringify(updatedCart));
-  };
-  const handleDelete = (itemId: number) => {
-    updateCartItem(itemId, 0);
   };
 
   if (cart.length === 0) {
@@ -279,7 +185,7 @@ export default function CartScreen() {
                   placeholder="Choisir"
                   value={subscriptionTypes[item.id] || "monthly"}
                   onChange={(selectedItem) => {
-                    handleSubscriptionTypeChange(
+                    updateSubscriptionType(
                       item.id,
                       selectedItem.value as SubscriptionType
                     );
@@ -287,7 +193,7 @@ export default function CartScreen() {
                 />
               </View>
             </View>
-            <TouchableOpacity onPress={() => handleDelete(item.id)}>
+            <TouchableOpacity onPress={() => deleteCartItem(item.id)}>
               <Ionicons name="trash" size={24} color="red" />
             </TouchableOpacity>
           </View>
@@ -300,7 +206,7 @@ export default function CartScreen() {
         </View>
         <TouchableOpacity
           style={styles.commandButton}
-          onPress={handlePayPress}
+          onPress={handleCheckout}
           disabled={loading}
         >
           {loading ? (

@@ -6,7 +6,7 @@ import Register from "../../components/Auth/Register";
 import { Colors } from "../../../constants/Colors";
 import { AuthContext } from "../../context/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import { API_URL } from "../../../constants/api";
 const SettingsScreen = () => {
   const { token, user, setToken, setUser } = useContext(AuthContext);
   const [selectedForm, setSelectedForm] = useState<"login" | "register">(
@@ -17,12 +17,11 @@ const SettingsScreen = () => {
     console.log("Token in context after update:", token);
   }, [token]);
   console.log("user", user);
-  const BASE_URL = "https://api.leonmorival.xyz/api";
 
   // New login handler moved from Login.tsx
   const loginHandler = async (email: string, password: string) => {
     try {
-      const response = await fetch(`${BASE_URL}/login`, {
+      const response = await fetch(`${API_URL}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

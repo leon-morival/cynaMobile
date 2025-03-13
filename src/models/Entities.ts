@@ -55,9 +55,14 @@ export interface Tickets {
   updated_at: string;
 }
 
+export enum BillingMethod {
+  ANNUAL = "ANNUAL",
+  MENSUAL = "MENSUAL",
+  LIFETIME = "LIFETIME",
+}
 export interface ClientSubscription {
   id: number;
-  billing_method: string;
+  billing_method: BillingMethod;
   started_at: string;
   end_at: string;
   price: number;
