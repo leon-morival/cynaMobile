@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import Toast from "react-native-toast-message";
 import AuthInput from "../Common/AuthInput";
+import { Colors } from "../../../constants/Colors";
+import { Ionicons } from "@expo/vector-icons";
 
 interface LoginProps {
   onLogin: (email: string, password: string) => void;
@@ -17,7 +19,11 @@ const Login = ({ onLogin }: LoginProps) => {
 
   return (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>Login</Text>
+      <View style={styles.headerContainer}>
+        <Ionicons name="log-in-outline" size={40} color={Colors.primary} />
+        <Text style={styles.sectionTitle}>Connexion</Text>
+      </View>
+
       <AuthInput
         type="email"
         label="Email :"
@@ -40,28 +46,43 @@ const Login = ({ onLogin }: LoginProps) => {
 
 const styles = StyleSheet.create({
   section: {
-    width: "80%",
+    width: "90%",
     marginBottom: 30,
-    padding: 10,
+    padding: 20,
     backgroundColor: "#fff",
-    borderRadius: 8,
+    borderRadius: 10,
     alignSelf: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  headerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.lightGray,
+    paddingBottom: 10,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: "600",
-    marginBottom: 10,
+    marginLeft: 10,
+    color: Colors.darkGray,
   },
   button: {
-    marginTop: 10,
-    backgroundColor: "#2196F3",
-    padding: 10,
-    borderRadius: 5,
+    marginTop: 20,
+    backgroundColor: Colors.primary,
+    padding: 15,
+    borderRadius: 8,
     alignItems: "center",
   },
   buttonText: {
     color: "#fff",
     fontWeight: "bold",
+    fontSize: 16,
   },
 });
 

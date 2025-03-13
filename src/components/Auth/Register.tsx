@@ -6,6 +6,8 @@ import AuthInput from "../Common/AuthInput";
 import { Civilite } from "../../models/Entities";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContext } from "../../context/AuthContext";
+import { Ionicons } from "@expo/vector-icons";
+import { Colors } from "../../../constants/Colors";
 
 import { API_URL } from "../../../constants/api";
 
@@ -78,7 +80,11 @@ const Register = () => {
 
   return (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>Register</Text>
+      <View style={styles.headerContainer}>
+        <Ionicons name="person-add-outline" size={40} color={Colors.primary} />
+        <Text style={styles.sectionTitle}>Inscription</Text>
+      </View>
+
       <AuthInput
         type="name"
         label="Nom :"
@@ -91,16 +97,19 @@ const Register = () => {
         value={registerEmail}
         onChangeText={setRegisterEmail}
       />
-      <Text>Civilité :</Text>
-      <Picker
-        selectedValue={registerCivilite}
-        onValueChange={(itemValue) => setRegisterCivilite(itemValue)}
-      >
-        <Picker.Item label="Monsieur" value={Civilite.MR} />
-        <Picker.Item label="Madame" value={Civilite.MME} />
-        <Picker.Item label="Entreprise" value={Civilite.ENT} />
-        <Picker.Item label="Autres" value={Civilite.AUT} />
-      </Picker>
+      <Text style={styles.label}>Civilité :</Text>
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={registerCivilite}
+          onValueChange={(itemValue) => setRegisterCivilite(itemValue)}
+          style={styles.picker}
+        >
+          <Picker.Item label="Monsieur" value={Civilite.MR} />
+          <Picker.Item label="Madame" value={Civilite.MME} />
+          <Picker.Item label="Entreprise" value={Civilite.ENT} />
+          <Picker.Item label="Autres" value={Civilite.AUT} />
+        </Picker>
+      </View>
       <AuthInput
         type="password"
         label="Mot de passe :"
@@ -130,28 +139,60 @@ const Register = () => {
 
 const styles = StyleSheet.create({
   section: {
-    width: "80%",
+    width: "90%",
     marginBottom: 30,
-    padding: 10,
+    padding: 20,
     backgroundColor: "#fff",
-    borderRadius: 8,
+    borderRadius: 10,
     alignSelf: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  headerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.lightGray,
+    paddingBottom: 10,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: "600",
-    marginBottom: 10,
+    marginLeft: 10,
+    color: Colors.darkGray,
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 5,
+    color: Colors.darkGray,
+    fontWeight: "500",
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: Colors.lightGray,
+    borderRadius: 5,
+    marginBottom: 15,
+    backgroundColor: "#f9f9f9",
+  },
+  picker: {
+    height: 50,
+    color: Colors.darkGray,
   },
   button: {
-    marginTop: 10,
-    backgroundColor: "#2196F3",
-    padding: 10,
-    borderRadius: 5,
+    marginTop: 20,
+    backgroundColor: Colors.primary,
+    padding: 15,
+    borderRadius: 8,
     alignItems: "center",
   },
   buttonText: {
     color: "#fff",
     fontWeight: "bold",
+    fontSize: 16,
   },
 });
 

@@ -7,6 +7,7 @@ import { Colors } from "../../../constants/Colors";
 import { AuthContext } from "../../context/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_URL } from "../../../constants/api";
+import Profile from "../../components/Settings/Profile";
 const SettingsScreen = () => {
   const { token, user, setToken, setUser } = useContext(AuthContext);
   const [selectedForm, setSelectedForm] = useState<"login" | "register">(
@@ -72,23 +73,25 @@ const SettingsScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Settings</Text>
       {token ? (
         <>
-          <View style={styles.profileContainer}>
-            <Text style={styles.profileTitle}>Profile</Text>
-            {user ? (
-              <>
-                <Text>Email: {user.email}</Text>
-                <Text>Civilité: {user.civilite}</Text>
-              </>
-            ) : (
-              <Text>Chargement des informations...</Text>
-            )}
-          </View>
-          <TouchableOpacity style={styles.logoutButton} onPress={logoutHandler}>
-            <Text style={styles.logoutButtonText}>Déconnexion</Text>
-          </TouchableOpacity>
+          {user ? (
+            <>
+              <Profile user={user} />
+              <TouchableOpacity
+                style={styles.logoutButton}
+                onPress={logoutHandler}
+              >
+                <Text style={styles.logoutButtonText}>Déconnexion</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <View style={styles.loadingContainer}>
+              <Text style={styles.loadingText}>
+                Chargement des informations utilisateur...
+              </Text>
+            </View>
+          )}
         </>
       ) : (
         <>
@@ -173,6 +176,16 @@ const styles = StyleSheet.create({
   logoutButtonText: {
     color: "#fff",
     fontWeight: "bold",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: "#666",
   },
 });
 
