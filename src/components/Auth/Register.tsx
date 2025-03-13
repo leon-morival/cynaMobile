@@ -45,7 +45,6 @@ const Register = () => {
         body: JSON.stringify(body),
       });
       const data = await response.json();
-      // console.log("register response", JSON.stringify(data, null, 2));
       if (!response.ok || data.errors) {
         const errorMsg =
           data.errors?.email && Array.isArray(data.errors.email)
@@ -58,12 +57,10 @@ const Register = () => {
         });
       }
 
-      // Save token first
       if (data.token) {
         await AsyncStorage.setItem("token", data.token);
         setToken(data.token);
 
-        // Fetch complete user profile using the token
         try {
           const userResponse = await fetch(`${API_URL}/user`, {
             method: "GET",

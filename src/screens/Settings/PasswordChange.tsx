@@ -1,23 +1,129 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
-  View,
-  Text,
+  ScrollView,
   StyleSheet,
+  Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
+  View,
+  ActivityIndicator,
 } from "react-native";
 import { Colors } from "../../../constants/Colors";
-import { Ionicons } from "@expo/vector-icons";
+import { API_URL } from "../../../constants/api";
+import { AuthContext } from "../../context/AuthContext";
+import Toast from "react-native-toast-message";
 
 export default function PasswordChange() {
+  const { token } = useContext(AuthContext);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleChangePassword = () => {
-    // Ici, vous implémenteriez la logique de changement de mot de passe
-    console.log("Changing password");
+  const handleChangePassword = async () => {
+    try {
+      // Reset errors
+      setErrors({});
+
+      // Client-side validation
+      if (!currentPassword) {
+        setErrors((prev) => ({
+          ...prev,
+          current_password: "Le mot de passe actuel est requis",
+        }));
+        return;
+      }
+
+      if (!newPassword) {
+        setErrors((prev) => ({
+          ...prev,
+          password: "Le nouveau mot de passe est requis",
+        }));
+        return;
+      }
+
+      if (newPassword.length < 8) {
+        setErrors((prev) => ({
+          ...prev,
+          password: "Le mot de passe doit contenir au moins 8 caractères",
+        }));
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        setErrors((prev) => ({
+          ...prev,
+          password_confirmation: "Les mots de passe ne correspondent pas",
+        }));
+        return;
+      }
+
+      setIsLoading(true);
+
+      if (!token) {
+        Toast.show({
+          type: "error",
+          text1: "Erreur",
+          text2: "Vous devez être connecté pour modifier votre mot de passe",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      // Call API using fetch
+      const response = await fetch(`${API_URL}/change-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          current_password: currentPassword,
+          password: newPassword,
+          password_confirmation: confirmPassword,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || data.errors) {
+        if (response.status === 422) {
+          // Validation errors from server
+          setErrors(data.errors || {});
+        } else {
+          const errorMsg =
+            data.message ||
+            "Une erreur est survenue lors de la modification du mot de passe";
+          Toast.show({
+            type: "error",
+            text1: "Erreur",
+            text2: errorMsg,
+          });
+        }
+        setIsLoading(false);
+        return;
+      }
+
+      // Success
+      Toast.show({
+        type: "success",
+        text1: "Succès",
+        text2: data.message || "Votre mot de passe a été modifié avec succès",
+      });
+
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Erreur",
+        text2: error.message || "Une erreur est survenue",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -30,40 +136,64 @@ export default function PasswordChange() {
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Mot de passe actuel</Text>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              errors.current_password ? styles.inputError : null,
+            ]}
             value={currentPassword}
             onChangeText={setCurrentPassword}
             secureTextEntry
             placeholder="Votre mot de passe actuel"
           />
+          {errors.current_password && (
+            <Text style={styles.errorText}>{errors.current_password}</Text>
+          )}
         </View>
 
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Nouveau mot de passe</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, errors.password ? styles.inputError : null]}
             value={newPassword}
             onChangeText={setNewPassword}
             secureTextEntry
             placeholder="Votre nouveau mot de passe"
           />
+          {errors.password && (
+            <Text style={styles.errorText}>{errors.password}</Text>
+          )}
         </View>
 
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Confirmez le nouveau mot de passe</Text>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              errors.password_confirmation ? styles.inputError : null,
+            ]}
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             secureTextEntry
             placeholder="Confirmer votre nouveau mot de passe"
           />
+          {errors.password_confirmation && (
+            <Text style={styles.errorText}>{errors.password_confirmation}</Text>
+          )}
         </View>
 
-        <TouchableOpacity style={styles.button} onPress={handleChangePassword}>
-          <Text style={styles.buttonText}>Modifier le mot de passe</Text>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleChangePassword}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>Modifier le mot de passe</Text>
+          )}
         </TouchableOpacity>
       </View>
+      <Toast />
     </ScrollView>
   );
 }
@@ -120,5 +250,13 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "600",
+  },
+  errorText: {
+    color: "red",
+    fontSize: 14,
+    marginTop: 5,
+  },
+  inputError: {
+    borderColor: "red",
   },
 });

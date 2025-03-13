@@ -11,7 +11,6 @@ export async function createClientSubscription(
   token: string
 ): Promise<boolean> {
   try {
-    console.log("subscription", JSON.stringify(subscriptions, null, 2));
     // Using the correct API route based on your provided routes
     const response = await fetch(`${API_URL}/client-subscriptions`, {
       method: "POST",
@@ -27,7 +26,6 @@ export async function createClientSubscription(
       console.error(`Error creating subscriptions: ${errorText}`);
 
       // Log more details about the response
-      console.log("Response status:", response.status);
       console.log(
         "Response headers:",
         JSON.stringify([...response.headers.entries()])

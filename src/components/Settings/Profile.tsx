@@ -28,7 +28,6 @@ export default function Profile({ user }: ProfileProps) {
     navigation.navigate(Routes.PasswordChange as never);
   };
 
-  console.log(JSON.stringify(user, null, 2));
   return (
     <>
       <Text style={{ alignSelf: "center", fontSize: 26, fontWeight: "800" }}>
