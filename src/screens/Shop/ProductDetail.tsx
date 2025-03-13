@@ -83,13 +83,14 @@ export default function ProductDetail() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.lightGray,
+    backgroundColor: "#fff",
   },
   image: {
     width: "100%",
     height: 250,
   },
   content: {
+    paddingTop: 30,
     padding: 15,
     backgroundColor: "#fff",
     borderTopLeftRadius: 8,

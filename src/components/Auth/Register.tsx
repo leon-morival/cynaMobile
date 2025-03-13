@@ -45,6 +45,7 @@ const Register = () => {
         body: JSON.stringify(body),
       });
       const data = await response.json();
+      console.log("register response", JSON.stringify(data, null, 2));
       if (!response.ok || data.errors) {
         const errorMsg =
           data.errors?.email && Array.isArray(data.errors.email)
@@ -56,14 +57,45 @@ const Register = () => {
           text2: errorMsg,
         });
       }
+
+      // Save token first
       if (data.token) {
         await AsyncStorage.setItem("token", data.token);
         setToken(data.token);
+
+        // Fetch complete user profile using the token
+        try {
+          const userResponse = await fetch(`${API_URL}/user`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${data.token}`,
+            },
+          });
+
+          if (userResponse.ok) {
+            const userData = await userResponse.json();
+            console.log(
+              "Complete user data:",
+              JSON.stringify(userData, null, 2)
+            );
+            setUser(userData);
+            await AsyncStorage.setItem("user", JSON.stringify(userData));
+          } else {
+            // Fallback to the limited user data if the profile fetch fails
+            setUser(data.user);
+            await AsyncStorage.setItem("user", JSON.stringify(data.user));
+          }
+        } catch (profileError) {
+          console.error("Error fetching complete profile:", profileError);
+          // Still use the basic user data we have
+          if (data.user) {
+            setUser(data.user);
+            await AsyncStorage.setItem("user", JSON.stringify(data.user));
+          }
+        }
       }
-      if (data.user) {
-        setUser(data.user);
-        await AsyncStorage.setItem("user", JSON.stringify(data.user));
-      }
+
       Toast.show({
         type: "success",
         text1: "Register",

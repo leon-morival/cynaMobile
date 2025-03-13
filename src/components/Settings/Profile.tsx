@@ -1,9 +1,10 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { User, Civilite, Role } from "../../models/Entities";
-
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../../../constants/Colors";
+import { useNavigation } from "@react-navigation/native";
+
 interface ProfileProps {
   user: User;
 }
@@ -21,6 +22,13 @@ const roleLabel = {
 };
 
 export default function Profile({ user }: ProfileProps) {
+  const navigation = useNavigation();
+
+  const handlePasswordChange = () => {
+    navigation.navigate("PasswordChange");
+  };
+
+  console.log(JSON.stringify(user, null, 2));
   return (
     <>
       <Text style={{ alignSelf: "center", fontSize: 26, fontWeight: "800" }}>
@@ -83,6 +91,21 @@ export default function Profile({ user }: ProfileProps) {
               {new Date(user.created_at).toLocaleDateString("fr-FR")}
             </Text>
           </View>
+
+          {/* Redirection vers l'écran de modification du mot de passe */}
+          <TouchableOpacity
+            style={styles.infoRow}
+            onPress={handlePasswordChange}
+          >
+            <Ionicons
+              name="lock-closed-outline"
+              size={20}
+              color={Colors.primary}
+              style={styles.rowIcon}
+            />
+            <Text style={styles.infoValue}>Modifier le mot de passe</Text>
+            <Ionicons name="chevron-forward" size={20} color={Colors.primary} />
+          </TouchableOpacity>
         </View>
       </View>
     </>

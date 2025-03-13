@@ -4,9 +4,10 @@ import { Ionicons } from "@expo/vector-icons";
 
 import HomeScreen from "../screens/Home/HomeScreen";
 import ShopStackNavigator from "./ShopStackNavigator";
-import SettingsScreen from "../screens/Settings/SettingsScreen";
 import CartScreen from "../screens/Cart/CartScreen";
 import { Colors } from "../../constants/Colors";
+import SettingsStackNavigator from "./SettingsStackNavigator";
+import { Routes } from "./Routes";
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
@@ -16,14 +17,14 @@ const TabNavigator = () => {
         tabBarIcon: ({ focused, color, size }) => {
           let iconName: any = "";
 
-          if (route.name === "Home") {
+          if (route.name === Routes.HomeScreen) {
             iconName = focused ? "home" : "home-outline";
-          } else if (route.name === "Shop") {
+          } else if (route.name === Routes.ShopTab) {
             // changé: icône de 'person' modifiée pour une icône de shopping
             iconName = focused ? "basket" : "basket-outline";
-          } else if (route.name === "Cart") {
+          } else if (route.name === Routes.CartScreen) {
             iconName = focused ? "cart" : "cart-outline"; // changed from settings to cart
-          } else if (route.name === "Settings") {
+          } else if (route.name === Routes.SettingsTab) {
             iconName = focused ? "settings" : "settings-outline";
           }
 
@@ -34,10 +35,13 @@ const TabNavigator = () => {
         headerShown: false,
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Shop" component={ShopStackNavigator} />
-      <Tab.Screen name="Cart" component={CartScreen} />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
+      <Tab.Screen name={Routes.HomeScreen} component={HomeScreen} />
+      <Tab.Screen name={Routes.ShopTab} component={ShopStackNavigator} />
+      <Tab.Screen name={Routes.CartScreen} component={CartScreen} />
+      <Tab.Screen
+        name={Routes.SettingsTab}
+        component={SettingsStackNavigator}
+      />
     </Tab.Navigator>
   );
 };
