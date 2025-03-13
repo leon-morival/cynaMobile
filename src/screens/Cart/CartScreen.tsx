@@ -141,6 +141,12 @@ export default function CartScreen() {
   if (cart.length === 0) {
     return (
       <View style={styles.emptyContainer}>
+        <Ionicons
+          name="cart-outline"
+          size={80}
+          color="#fff"
+          style={styles.emptyIcon}
+        />
         <Text style={styles.emptyText}>Votre panier est vide</Text>
         <TouchableOpacity
           style={styles.shopButton}
@@ -158,19 +164,18 @@ export default function CartScreen() {
         <Text style={styles.headerTitle}>Mon panier</Text>
         {cart.map((item) => (
           <View key={item.id} style={styles.productItem}>
-            <Image
-              source={{ uri: item.image_path }}
-              style={styles.productImage}
-            />
+            <Image source={{ uri: item.url }} style={styles.productImage} />
             <View style={styles.productDetails}>
               <Text style={styles.productName}>{item.name}</Text>
               <Text style={styles.productDetail}>
                 Prix:{" "}
-                {(
-                  item.price *
-                  (subscriptionTypes[item.id] === "annual" ? 10 : 1)
-                ).toFixed(2)}{" "}
-                €
+                <Text style={styles.priceValue}>
+                  {(
+                    item.price *
+                    (subscriptionTypes[item.id] === "annual" ? 10 : 1)
+                  ).toFixed(2)}{" "}
+                  €
+                </Text>
               </Text>
               <View style={styles.subscriptionTypeContainer}>
                 <Text style={styles.productDetail}>Type: </Text>
@@ -178,6 +183,8 @@ export default function CartScreen() {
                   style={styles.dropdown}
                   placeholderStyle={styles.placeholderStyle}
                   selectedTextStyle={styles.selectedTextStyle}
+                  itemContainerStyle={styles.dropdownItemContainer}
+                  itemTextStyle={styles.dropdownItemText}
                   data={subscriptionTypeData}
                   maxHeight={300}
                   labelField="label"
@@ -193,8 +200,15 @@ export default function CartScreen() {
                 />
               </View>
             </View>
-            <TouchableOpacity onPress={() => deleteCartItem(item.id)}>
-              <Ionicons name="trash" size={24} color="red" />
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={() => deleteCartItem(item.id)}
+            >
+              <Ionicons
+                name="trash-outline"
+                size={24}
+                color={Colors.secondary}
+              />
             </TouchableOpacity>
           </View>
         ))}
@@ -210,9 +224,17 @@ export default function CartScreen() {
           disabled={loading}
         >
           {loading ? (
-            <ActivityIndicator color="#fff" />
+            <ActivityIndicator color="#fff" size="small" />
           ) : (
-            <Text style={styles.commandButtonText}>Commander</Text>
+            <>
+              <Text style={styles.commandButtonText}>Commander</Text>
+              <Ionicons
+                name="arrow-forward"
+                size={20}
+                color="#fff"
+                style={styles.buttonIcon}
+              />
+            </>
           )}
         </TouchableOpacity>
       </View>
@@ -228,7 +250,7 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   productContainer: {
-    padding: 10,
+    padding: 15,
     paddingBottom: 140,
   },
   headerTitle: {
@@ -236,103 +258,166 @@ const styles = StyleSheet.create({
     fontSize: 30,
     color: "#fff",
     textAlign: "left",
-    marginBottom: 10,
-    marginTop: 25,
-    marginLeft: 20,
+    marginBottom: 20,
+    marginTop: 30,
+    marginLeft: 10,
   },
   productItem: {
-    padding: 10,
-    marginVertical: 5,
-    borderWidth: 1,
-    borderRadius: 3,
-    width: "90%",
+    padding: 15,
+    marginVertical: 8,
+    borderRadius: 10,
+    width: "95%",
     backgroundColor: "#fff",
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   productImage: {
-    width: 100,
-    height: 100,
-    marginRight: 10,
+    width: 80,
+    height: 80,
+    marginRight: 15,
+    borderRadius: 8,
   },
   productDetails: {
     flex: 1,
   },
   productName: {
     fontSize: 18,
-    fontWeight: "600",
+    fontWeight: "700",
+    color: Colors.primary,
+    marginBottom: 5,
   },
   productDetail: {
     fontSize: 14,
     color: "#555",
+    marginBottom: 4,
+  },
+  priceValue: {
+    fontWeight: "600",
+    color: Colors.secondary,
   },
   bottomBar: {
     position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: Colors.lightGray,
-    padding: 10,
-    alignItems: "center",
-    paddingVertical: 40,
+    backgroundColor: "#fff",
+    padding: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 10,
   },
   totalRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    width: "90%",
-    marginBottom: 5,
+    width: "100%",
+    marginBottom: 15,
   },
   labelTotal: {
     color: Colors.primary,
-    fontSize: 20,
-    fontWeight: "600",
+    fontSize: 22,
+    fontWeight: "700",
   },
   priceTotal: {
-    color: Colors.primary,
-    fontSize: 20,
-    fontWeight: "600",
+    color: Colors.secondary,
+    fontSize: 22,
+    fontWeight: "700",
   },
   commandButton: {
-    backgroundColor: "#FF6B00",
-    padding: 10,
-    borderRadius: 5,
-    width: "90%",
+    backgroundColor: Colors.secondary,
+    padding: 15,
+    borderRadius: 10,
+    width: "100%",
     alignSelf: "center",
     marginBottom: 5,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
   },
   commandButtonText: {
     color: "#fff",
     textAlign: "center",
-    fontWeight: "500",
+    fontWeight: "600",
+    fontSize: 16,
   },
-  paymentMethods: {
-    color: "#fff",
-    marginTop: 5,
+  buttonIcon: {
+    marginLeft: 8,
   },
   emptyContainer: {
     flex: 1,
-    backgroundColor: "#302082",
+    backgroundColor: Colors.primary,
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
   },
+  emptyIcon: {
+    marginBottom: 20,
+  },
   emptyText: {
     color: "#fff",
-    fontSize: 18,
-    marginBottom: 20,
+    fontSize: 20,
+    marginBottom: 30,
+    fontWeight: "500",
   },
   shopButton: {
     backgroundColor: Colors.secondary,
-    padding: 12,
-    borderRadius: 5,
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 10,
     width: "80%",
   },
   shopButtonText: {
     color: "#fff",
     textAlign: "center",
+    fontWeight: "600",
+    fontSize: 16,
+  },
+  deleteButton: {
+    padding: 10,
+  },
+  dropdown: {
+    width: 120,
+    height: 36,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    paddingHorizontal: 10,
+    marginLeft: 5,
+  },
+  placeholderStyle: {
+    fontSize: 13,
+    color: "#555",
+  },
+  selectedTextStyle: {
+    fontSize: 13,
+    color: Colors.primary,
     fontWeight: "500",
   },
+  dropdownItemContainer: {
+    backgroundColor: "#fff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+  },
+  dropdownItemText: {
+    fontSize: 13,
+    color: Colors.primary,
+  },
+  subscriptionTypeContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 8,
+  },
+  // Removing unused styles
   quantityControls: {
     flexDirection: "row",
     alignItems: "center",
@@ -349,33 +434,6 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: "#000",
   },
-  deleteButton: {
-    marginLeft: 15,
-    fontSize: 16,
-    color: "red",
-  },
-  dropdown: {
-    width: 120,
-    height: 36,
-    backgroundColor: "#f5f5f5",
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    paddingHorizontal: 8,
-  },
-  placeholderStyle: {
-    fontSize: 12,
-    color: "#555",
-  },
-  selectedTextStyle: {
-    fontSize: 12,
-    color: "#000",
-  },
-  subscriptionTypeContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 5,
-  },
   pickerContainer: {
     display: "none",
   },
@@ -387,5 +445,9 @@ const styles = StyleSheet.create({
   },
   pickerItemText: {
     display: "none",
+  },
+  paymentMethods: {
+    color: "#fff",
+    marginTop: 5,
   },
 });
