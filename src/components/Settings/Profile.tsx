@@ -4,7 +4,7 @@ import { User, Civilite, Role } from "../../models/Entities";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../../../constants/Colors";
 import { useNavigation } from "@react-navigation/native";
-
+import { Routes } from "../../navigation/Routes";
 interface ProfileProps {
   user: User;
 }
@@ -25,7 +25,7 @@ export default function Profile({ user }: ProfileProps) {
   const navigation = useNavigation();
 
   const handlePasswordChange = () => {
-    navigation.navigate("PasswordChange");
+    navigation.navigate(Routes.PasswordChange as never);
   };
 
   console.log(JSON.stringify(user, null, 2));

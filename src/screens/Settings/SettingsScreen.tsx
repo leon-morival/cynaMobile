@@ -14,11 +14,6 @@ const SettingsScreen = () => {
     "login"
   );
 
-  useEffect(() => {
-    console.log("Token in context after update:", token);
-  }, [token]);
-  console.log("user", user);
-
   // New login handler moved from Login.tsx
   const loginHandler = async (email: string, password: string) => {
     try {

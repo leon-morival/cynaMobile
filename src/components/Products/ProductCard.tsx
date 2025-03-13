@@ -11,6 +11,7 @@ import { useNavigation } from "@react-navigation/native";
 import { SubscriptionOffer } from "../../models/Entities";
 import { Colors } from "../../../constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
+import { Routes } from "../../navigation/Routes";
 
 interface ProductCardProps {
   offer: SubscriptionOffer;
@@ -20,7 +21,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ offer }) => {
   const navigation = useNavigation<any>();
 
   const handlePress = () => {
-    navigation.navigate("ProductDetail", { product: offer });
+    navigation.navigate(Routes.ProductDetail, { product: offer });
   };
 
   return (

@@ -45,7 +45,7 @@ const Register = () => {
         body: JSON.stringify(body),
       });
       const data = await response.json();
-      console.log("register response", JSON.stringify(data, null, 2));
+      // console.log("register response", JSON.stringify(data, null, 2));
       if (!response.ok || data.errors) {
         const errorMsg =
           data.errors?.email && Array.isArray(data.errors.email)
@@ -75,10 +75,7 @@ const Register = () => {
 
           if (userResponse.ok) {
             const userData = await userResponse.json();
-            console.log(
-              "Complete user data:",
-              JSON.stringify(userData, null, 2)
-            );
+
             setUser(userData);
             await AsyncStorage.setItem("user", JSON.stringify(userData));
           } else {

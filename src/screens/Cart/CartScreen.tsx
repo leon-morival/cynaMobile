@@ -22,6 +22,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Dropdown } from "react-native-element-dropdown";
 import { useCart, SubscriptionType } from "../../hooks/useCart";
 import { usePayment } from "../../hooks/usePayment";
+import { Routes } from "../../navigation/Routes";
 
 // Create data for the dropdown
 const subscriptionTypeData = [
@@ -150,7 +151,7 @@ export default function CartScreen() {
         <Text style={styles.emptyText}>Votre panier est vide</Text>
         <TouchableOpacity
           style={styles.shopButton}
-          onPress={() => navigation.navigate("Shop")}
+          onPress={() => navigation.navigate(Routes.ShopTab as never)}
         >
           <Text style={styles.shopButtonText}>Continuer mes achats</Text>
         </TouchableOpacity>

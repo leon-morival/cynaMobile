@@ -11,6 +11,7 @@ import {
 import { Colors } from "../../../constants/Colors";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
+import { Routes } from "../../navigation/Routes";
 
 export default function HomeScreen() {
   const navigation = useNavigation();
@@ -107,7 +108,7 @@ export default function HomeScreen() {
         </Text>
         <TouchableOpacity
           style={styles.ctaButton}
-          onPress={() => navigation.navigate("Shop")}
+          onPress={() => navigation.navigate(Routes.ShopTab as never)}
         >
           <Text style={styles.ctaButtonText}>Explorer</Text>
         </TouchableOpacity>
