@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
+
 import { initStripe } from "@stripe/stripe-react-native";
 import { createClientSubscription } from "../../../services/subscriptionService";
 import {
@@ -29,7 +30,7 @@ const subscriptionTypeData = [
   { label: "Mensuel", value: "monthly" },
   { label: "Annuel", value: "annual" },
 ];
-
+console.log("env variable", process.env.TEST);
 export default function CartScreen() {
   const navigation = useNavigation();
   const [token, setToken] = useState<string | null>(null);
