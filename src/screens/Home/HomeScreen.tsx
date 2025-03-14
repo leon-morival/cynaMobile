@@ -1,16 +1,16 @@
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import {
+  Dimensions,
+  Image,
   ScrollView,
   StyleSheet,
   Text,
-  View,
-  Image,
   TouchableOpacity,
-  Dimensions,
+  View,
 } from "react-native";
 import { Colors } from "../../../constants/Colors";
-import { useNavigation } from "@react-navigation/native";
-import { Ionicons } from "@expo/vector-icons";
 import { Routes } from "../../navigation/Routes";
 
 export default function HomeScreen() {
@@ -22,31 +22,49 @@ export default function HomeScreen() {
       key: "advancedSecurity",
       title: "Protection Avancée",
       icon: "shield-checkmark-outline",
+      iconColor: "#7986CB", // Bleu indigo pastel
+      textColor: "#5C6BC0",
+      bgColor: "rgba(121, 134, 203, 0.15)",
     },
     {
       key: "threatDetection",
       title: "Détection Menaces",
       icon: "scan-outline",
+      iconColor: "#81C784", // Vert pastel
+      textColor: "#66BB6A",
+      bgColor: "rgba(129, 199, 132, 0.15)",
     },
     {
       key: "secureAccess",
       title: "Accès Sécurisé",
       icon: "key-outline",
+      iconColor: "#9575CD", // Violet pastel
+      textColor: "#7E57C2",
+      bgColor: "rgba(149, 117, 205, 0.15)",
     },
     {
       key: "dataEncryption",
       title: "Chiffrement",
       icon: "lock-closed-outline",
+      iconColor: "#4FC3F7", // Bleu clair pastel
+      textColor: "#29B6F6",
+      bgColor: "rgba(79, 195, 247, 0.15)",
     },
     {
       key: "complianceTools",
       title: "Conformité",
       icon: "checkmark-circle-outline",
+      iconColor: "#FF8A65", // Orange doux
+      textColor: "#FF7043",
+      bgColor: "rgba(255, 138, 101, 0.15)",
     },
     {
       key: "support",
       title: "Support 24/7",
       icon: "headset-outline",
+      iconColor: "#90A4AE", // Bleu-gris
+      textColor: "#78909C",
+      bgColor: "rgba(144, 164, 174, 0.15)",
     },
   ];
 
@@ -96,14 +114,21 @@ export default function HomeScreen() {
         <View style={styles.featureSection}>
           {featureList.map((feature) => (
             <View key={feature.key} style={styles.feBox}>
-              <View style={styles.feImageContainer}>
+              <View
+                style={[
+                  styles.feImageContainer,
+                  { backgroundColor: feature.bgColor },
+                ]}
+              >
                 <Ionicons
                   name={feature.icon}
                   size={32}
-                  color={Colors.primary}
+                  color={feature.iconColor}
                 />
               </View>
-              <Text style={styles.feText}>{feature.title}</Text>
+              <Text style={[styles.feText, { color: feature.textColor }]}>
+                {feature.title}
+              </Text>
             </View>
           ))}
         </View>
@@ -247,7 +272,6 @@ const styles = StyleSheet.create({
   feImageContainer: {
     width: 60,
     height: 60,
-    backgroundColor: "rgba(205, 212, 248, 0.6)",
     borderRadius: 30,
     justifyContent: "center",
     alignItems: "center",
@@ -256,7 +280,6 @@ const styles = StyleSheet.create({
   feText: {
     textAlign: "center",
     fontWeight: "600",
-    color: Colors.primary,
     fontSize: 14,
   },
   ctaSection: {

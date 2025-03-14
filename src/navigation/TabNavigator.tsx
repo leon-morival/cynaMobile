@@ -18,14 +18,14 @@ const TabNavigator = () => {
         tabBarIcon: ({ focused, color, size }) => {
           let iconName: any = "";
 
-          if (route.name === Routes.HomeTab) {
+          if (route.name === "Accueil") {
             iconName = focused ? "home" : "home-outline";
-          } else if (route.name === Routes.ShopTab) {
+          } else if (route.name === "Offres") {
             // changé: icône de 'person' modifiée pour une icône de shopping
             iconName = focused ? "basket" : "basket-outline";
-          } else if (route.name === Routes.CartScreen) {
+          } else if (route.name === "Panier") {
             iconName = focused ? "cart" : "cart-outline"; // changed from settings to cart
-          } else if (route.name === Routes.SettingsTab) {
+          } else if (route.name === "Paramètres") {
             iconName = focused ? "settings" : "settings-outline";
           }
 
@@ -36,13 +36,10 @@ const TabNavigator = () => {
         headerShown: false,
       })}
     >
-      <Tab.Screen name={Routes.HomeTab} component={HomeStackNavigator} />
-      <Tab.Screen name={Routes.ShopTab} component={ShopStackNavigator} />
-      <Tab.Screen name={Routes.CartScreen} component={CartScreen} />
-      <Tab.Screen
-        name={Routes.SettingsTab}
-        component={SettingsStackNavigator}
-      />
+      <Tab.Screen name={"Accueil"} component={HomeStackNavigator} />
+      <Tab.Screen name={"Offres"} component={ShopStackNavigator} />
+      <Tab.Screen name={"Panier"} component={CartScreen} />
+      <Tab.Screen name={"Paramètres"} component={SettingsStackNavigator} />
     </Tab.Navigator>
   );
 };
