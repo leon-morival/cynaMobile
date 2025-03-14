@@ -57,12 +57,49 @@ export const useAppInfo = () => {
 
   // Memoize the context generation function to prevent recreation on every render
   const generateAIContext = useCallback(() => {
+    console.log("Generating AI context with:", {
+      categoriesCount: categories.length,
+      productsCount: subscriptionOffers.length,
+    });
+
+    // Verify data exists before proceeding
+    if (categories.length === 0 || subscriptionOffers.length === 0) {
+      console.warn("Missing data for AI context: categories or products empty");
+      // Return a minimal context that indicates data is missing
+      return `
+Information sur l'application ${APP_INFO.name}:
+[Données des produits en cours de chargement...]
+Les données complètes des produits et catégories ne sont pas encore disponibles.
+`;
+    }
+
     // Create a mapping of category IDs to names for easy reference
     const categoryMap = categories.reduce((acc, cat) => {
       acc[cat.id] = cat.name;
       return acc;
     }, {} as Record<string, string>);
 
+    // Create a simpler, more direct context with key product information
+    const productsList = subscriptionOffers
+      .map(
+        (product) =>
+          `- ${product.name} (ID: ${product.id}) - Catégorie: ${
+            categoryMap[product.category_id] || "Non catégorisé"
+          } - Prix: ${product.price}€ - ${product.description.substring(
+            0,
+            100
+          )}...`
+      )
+      .join("\n");
+
+    const categoriesList = categories
+      .map((category) => {
+        const productsInCategory = getProductsByCategory(category.id);
+        return `- ${category.name} (${productsInCategory.length} produits)`;
+      })
+      .join("\n");
+
+    // Build the context with relevant information
     return `
 Information sur l'application ${APP_INFO.name}:
 
@@ -89,26 +126,17 @@ Information sur l'application ${APP_INFO.name}:
     ${APP_INFO.customerSupport.contactMethods
       .map((method) => `- ${method}`)
       .join("\n    ")}
-  - Fonctionnalités du chatbot:
-    ${APP_INFO.customerSupport.chatbotFeatures
-      .map((feature) => `- ${feature}`)
-      .join("\n    ")}
 
 7. Catégories disponibles (${categories.length}):
-${categories
-  .map((category) => {
-    // Count products in this category
-    const productsInCategory = getProductsByCategory(category.id);
-    return `  - ${category.name} - ${productsInCategory.length} produits`;
-  })
-  .join("\n")}
+${categoriesList}
 
-8. Produits disponibles par catégorie:
+8. LISTE COMPLÈTE DES PRODUITS (${subscriptionOffers.length}):
+${productsList}
+
+9. Produits par catégorie:
 ${categories
   .map((category) => {
-    const categoryProducts = subscriptionOffers.filter(
-      (offer) => offer.category_id === category.id
-    );
+    const categoryProducts = getProductsByCategory(category.id);
 
     if (categoryProducts.length === 0)
       return `  • ${category.name}: Aucun produit disponible`;
@@ -125,27 +153,12 @@ ${categoryProducts
   })
   .join("\n\n")}
 
-9. Détails des produits populaires:
-${subscriptionOffers
-  .slice(0, 5)
-  .map(
-    (offer) => `
-  • ${offer.name} (ID: ${offer.id}):
-    - Catégorie: ${categoryMap[offer.category_id] || "Non catégorisé"}
-    - Prix: ${offer.price}€
-    - Description complète: ${offer.description}
-`
-  )
-  .join("\n")}
-
-Instructions pour répondre aux questions:
-1. Utiliser ces informations pour répondre aux questions sur l'application, les catégories et les produits disponibles.
-2. IMPORTANT: Quand vous mentionnez un produit, écrivez TOUJOURS son nom EXACT suivi de son ID entre parenthèses, dans ce format précis: "Service de paiement en ligne (ID: 3)". Ce format est essentiel pour que l'utilisateur puisse cliquer sur les produits mentionnés.
-3. Pour chaque produit mentionné, incluez toujours son ID comme dans l'exemple ci-dessus.
-4. Recommander les fonctionnalités pertinentes lorsque cela est approprié.
-5. Maintenir un ton professionnel et amical.
-6. Pour les questions techniques spécifiques ou problèmes, suggérer de contacter le support client.
-7. Ne pas inventer d'informations qui ne sont pas incluses dans ce contexte.
+INSTRUCTIONS IMPORTANTES:
+1. Utilise TOUJOURS ce format exact pour mentionner les produits: "Nom du produit (ID: X)" pour que les utilisateurs puissent cliquer dessus.
+2. Recommande les fonctionnalités pertinentes quand approprié.
+3. Maintiens un ton professionnel et amical.
+4. Pour les questions techniques spécifiques, suggère de contacter le support client.
+5. Ne pas inventer d'informations qui ne sont pas incluses dans ce contexte.
 `;
   }, [categories, subscriptionOffers, APP_INFO, getProductsByCategory]);
 

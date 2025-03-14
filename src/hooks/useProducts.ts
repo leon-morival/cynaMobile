@@ -15,7 +15,7 @@ export const useProducts = () => {
     setIsLoading(true);
     setError(null);
     try {
-      // Fetch categoaaaries
+      // Fetch categories
       const catResponse = await fetch(`${API_URL}/categories`);
       if (!catResponse.ok) {
         throw new Error(`Error fetching categories: ${catResponse.status}`);

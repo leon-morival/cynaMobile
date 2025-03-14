@@ -59,16 +59,58 @@ export default function ChatBotScreen() {
     let isMounted = true;
 
     // Check if we actually have data before initializing
-    if (categories.length === 0 && subscriptionOffers.length === 0) {
-      console.log("No data available yet, waiting...");
+    if (categories.length === 0 || subscriptionOffers.length === 0) {
+      console.log(
+        "No data available yet, waiting for products and categories..."
+      );
       return;
     }
+
+    console.log("Initializing chat with data:", {
+      categoriesCount: categories.length,
+      productsCount: subscriptionOffers.length,
+    });
 
     const initializeChat = async () => {
       try {
         const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+        // Generate context with product data
         const appContext = memoizedContext();
+        console.log("Chat context length:", appContext.length);
+
+        // Debug info - print the first 500 characters and last 500 characters of context
+        console.log("Context start:", appContext.substring(0, 500));
+        console.log(
+          "Context end:",
+          appContext.substring(appContext.length - 500)
+        );
+
+        // Verify the context contains product information
+        const containsProductInfo = appContext.includes(
+          "Produits disponibles par catégorie"
+        );
+        console.log("Context contains product info:", containsProductInfo);
+
+        // Try to directly use the categories and product data to ensure they are passed correctly
+        const manualContext = `
+Information sur l'application Cyna:
+
+Catégories disponibles (${categories.length}):
+${categories.map((cat) => `- ${cat.name} (ID: ${cat.id})`).join("\n")}
+
+Produits disponibles (${subscriptionOffers.length}):
+${subscriptionOffers
+  .map((prod) => `- ${prod.name} (ID: ${prod.id}) - Prix: ${prod.price}€`)
+  .join("\n")}
+`;
+
+        console.log("Manual context sample:", manualContext.substring(0, 200));
+
+        // Use a combination of the generated context and manual context for more reliability
+        const combinedContext =
+          appContext + "\n\nDONNÉES SUPPLÉMENTAIRES:\n" + manualContext;
 
         const chatSession = model.startChat({
           history: [
@@ -90,7 +132,7 @@ export default function ChatBotScreen() {
             },
             {
               role: "user",
-              parts: [{ text: appContext }],
+              parts: [{ text: combinedContext }],
             },
             {
               role: "model",
@@ -104,7 +146,7 @@ export default function ChatBotScreen() {
               role: "user",
               parts: [
                 {
-                  text: "Assure-toi de bien utiliser les informations sur les produits lorsqu'un utilisateur pose des questions sur un produit spécifique. Tu as accès à la liste complète des produits disponibles et leurs détails dans le contexte fourni.",
+                  text: "IMPORTANT: Pour chaque produit que tu mentionneras, assure-toi d'inclure TOUJOURS son ID entre parenthèses exactement comme ceci: 'Service de paiement en ligne (ID: 3)'. Ce format est essentiel pour que l'utilisateur puisse cliquer sur les produits dans l'application.",
                 },
               ],
             },
@@ -112,7 +154,7 @@ export default function ChatBotScreen() {
               role: "model",
               parts: [
                 {
-                  text: "Je comprends. Je vais m'assurer d'utiliser les détails spécifiques des produits fournis dans le contexte pour répondre précisément aux questions des utilisateurs sur les produits. J'ai accès à leurs noms, descriptions, prix et catégories, et je les utiliserai pour donner des informations exactes.",
+                  text: "Je comprends parfaitement. Je veillerai à toujours mentionner l'ID de chaque produit entre parenthèses dans ce format précis : 'Nom du produit (ID: X)'. Cette convention permettra aux utilisateurs de cliquer sur les produits mentionnés dans l'interface de l'application.",
                 },
               ],
             },
@@ -125,9 +167,30 @@ export default function ChatBotScreen() {
         if (isMounted) {
           setChat(chatSession);
           setChatInitialized(true);
+          console.log("Chat initialized successfully");
+
+          // Add initialization success message
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            {
+              id: Date.now().toString(),
+              text: "Je suis prêt à vous aider avec toutes vos questions sur nos produits et services. N'hésitez pas à me demander des informations sur nos offres disponibles !",
+              sender: "bot",
+            },
+          ]);
         }
       } catch (error) {
         console.error("Error initializing chat:", error);
+
+        // Add error notification to user
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          {
+            id: Date.now().toString(),
+            text: "Je suis actuellement en train de me connecter à nos services. Merci de patienter un instant ou de rafraîchir l'application si vous ne recevez pas de réponse.",
+            sender: "bot",
+          },
+        ]);
       }
     };
 
@@ -139,8 +202,8 @@ export default function ChatBotScreen() {
   }, [
     isDataReady,
     memoizedContext,
-    categories.length,
-    subscriptionOffers.length,
+    categories,
+    subscriptionOffers,
     chatInitialized,
   ]);
 
@@ -191,9 +254,6 @@ export default function ChatBotScreen() {
       return <Text style={styles.messageText}>{text}</Text>;
     }
 
-    // Log for debugging
-    console.log("Parsing message for product mentions:", text);
-
     // For bot messages, use a regex to find product mentions with (ID: X) format
     const parts: JSX.Element[] = [];
     let lastIndex = 0;
@@ -216,16 +276,20 @@ export default function ChatBotScreen() {
       const productName = match[1].trim();
       const productId = Number(match[2]);
 
+      console.log("Found product mention:", productName, "with ID:", productId);
+
       // Find the product
       const product = findProductById(productId);
 
       if (product) {
+        console.log("Product found in database:", product.name);
         // Make this part clickable
         parts.push(
           <Text
             key={`product-${productId}-${match.index}`}
             style={[styles.messageText, styles.productMention]}
             onPress={() => {
+              console.log("Navigating to product:", product.name);
               navigation.navigate(Routes.ShopTab, {
                 screen: Routes.ProductDetail,
                 params: { product },
@@ -236,6 +300,7 @@ export default function ChatBotScreen() {
           </Text>
         );
       } else {
+        console.log("Product not found in database:", productId);
         parts.push(
           <Text key={`nomatch-${match.index}`} style={styles.messageText}>
             {match[0]}
