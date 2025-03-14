@@ -19,33 +19,33 @@ export default function HomeScreen() {
 
   const featureList = [
     {
-      key: "freeShipping",
-      title: "Free Shipping",
-      icon: "bicycle-outline",
+      key: "advancedSecurity",
+      title: "Protection Avancée",
+      icon: "shield-checkmark-outline",
     },
     {
-      key: "onlineOrder",
-      title: "Online Order",
-      icon: "cart-outline",
+      key: "threatDetection",
+      title: "Détection Menaces",
+      icon: "scan-outline",
     },
     {
-      key: "saveMoney",
-      title: "Save Money",
-      icon: "wallet-outline",
+      key: "secureAccess",
+      title: "Accès Sécurisé",
+      icon: "key-outline",
     },
     {
-      key: "promotions",
-      title: "Promotions",
-      icon: "pricetags-outline",
+      key: "dataEncryption",
+      title: "Chiffrement",
+      icon: "lock-closed-outline",
     },
     {
-      key: "happySell",
-      title: "Happy Sell",
-      icon: "happy-outline",
+      key: "complianceTools",
+      title: "Conformité",
+      icon: "checkmark-circle-outline",
     },
     {
       key: "support",
-      title: "24/7 Support",
+      title: "Support 24/7",
       icon: "headset-outline",
     },
   ];
@@ -56,10 +56,11 @@ export default function HomeScreen() {
         {/* Hero Section */}
         <View style={styles.heroSection}>
           <View style={styles.textContainer}>
-            <Text style={styles.valueDealsText}>Offre exclusive</Text>
-            <Text style={styles.productsText}>Sur tous nos produits</Text>
+            <Text style={styles.valueDealsText}>Sécurité Intransigeante</Text>
+            <Text style={styles.productsText}>Solutions SAS Cybersécurité</Text>
             <Text style={styles.savingsText}>
-              Économisez plus avec nos coupons & jusqu'à 70% de réduction!
+              Protégez votre entreprise contre les cybermenaces avec nos
+              systèmes d'accès sécurisés de pointe
             </Text>
           </View>
 
@@ -75,7 +76,7 @@ export default function HomeScreen() {
               navigation.navigate("Shop" as never);
             }}
           >
-            <Text style={styles.buttonText}>Acheter maintenant</Text>
+            <Text style={styles.buttonText}>Sécuriser maintenant</Text>
             <Ionicons
               name="arrow-forward"
               size={20}
@@ -87,7 +88,9 @@ export default function HomeScreen() {
 
         {/* Features Section */}
         <View style={styles.sectionTitle}>
-          <Text style={styles.sectionTitleText}>Nos services</Text>
+          <Text style={styles.sectionTitleText}>
+            Nos solutions de cybersécurité
+          </Text>
         </View>
 
         <View style={styles.featureSection}>
@@ -107,15 +110,16 @@ export default function HomeScreen() {
 
         {/* Call to action section */}
         <View style={styles.ctaSection}>
-          <Text style={styles.ctaTitle}>Découvrez nos offres</Text>
+          <Text style={styles.ctaTitle}>Protection Entreprise</Text>
           <Text style={styles.ctaSubtitle}>
-            Des solutions adaptées à vos besoins
+            Des SAS d'accès sécurisés pour protéger vos données sensibles et
+            infrastructures critiques
           </Text>
           <TouchableOpacity
             style={styles.ctaButton}
             onPress={() => navigation.navigate(Routes.ShopTab as never)}
           >
-            <Text style={styles.ctaButtonText}>Explorer</Text>
+            <Text style={styles.ctaButtonText}>Découvrir nos SAS</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

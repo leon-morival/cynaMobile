@@ -117,6 +117,7 @@ export default function CartScreen() {
       );
 
       if (success) {
+        console.log("Client subscriptions created successfully");
         // After successful subscription creation, create an order record
         await createOrder(totalAmount, token);
       } else {

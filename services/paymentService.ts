@@ -26,6 +26,7 @@ export async function createPaymentIntent(
     }
 
     const data = await response.json();
+    console.log("Raw response data:", data); // added log
 
     // Map the secret from data if returned as "client_secret"
     return { clientSecret: data.client_secret || data.clientSecret };
