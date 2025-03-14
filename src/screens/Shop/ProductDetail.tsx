@@ -22,9 +22,6 @@ export default function ProductDetail() {
   const { params } = useRoute<ProductDetailRouteProp>();
   const product = params.product;
 
-  // Log product details for debugging
-  console.log("Displaying product details:", product.id, product.name);
-
   const addToCart = async () => {
     try {
       const storedCart = await AsyncStorage.getItem("cart");

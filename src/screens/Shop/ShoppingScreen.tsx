@@ -6,26 +6,28 @@ import {
   StyleSheet,
   TextInput,
   ActivityIndicator,
+  RefreshControl,
 } from "react-native";
 import CategoryCard from "../../components/Categories/CategoryCard";
 import ProductCard from "../../components/Products/ProductCard";
 import { Colors } from "../../../constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
-import { useAppInfo } from "../../../constants/appInfo";
+import { useProducts } from "../../hooks/useProducts";
 
 export default function ShoppingScreen() {
-  const { categories, subscriptionOffers, isLoading } = useAppInfo();
+  const { categories, isLoading, refreshData, searchProducts } = useProducts();
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [refreshing, setRefreshing] = useState(false);
 
   // Filter offers based on search query
-  const filteredOffers =
-    searchQuery.trim() === ""
-      ? subscriptionOffers
-      : subscriptionOffers.filter(
-          (offer) =>
-            offer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            offer.description.toLowerCase().includes(searchQuery.toLowerCase())
-        );
+  const filteredOffers = searchProducts(searchQuery);
+
+  // Handle pull-to-refresh
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await refreshData();
+    setRefreshing(false);
+  };
 
   return (
     <View style={styles.container}>
@@ -55,13 +57,18 @@ export default function ShoppingScreen() {
         )}
       </View>
 
-      {isLoading ? (
+      {isLoading && !refreshing ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={Colors.secondary} />
           <Text style={styles.loadingText}>Chargement des produits...</Text>
         </View>
       ) : (
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
           {categories && categories.length > 0 ? (
             searchQuery.trim() === "" ? (
               // Show categories when not searching

@@ -34,7 +34,6 @@ export const createOrder = async (
       return false;
     }
 
-    console.log("Order record created successfully");
     return true;
   } catch (error) {
     console.error("Error creating order record:", error);

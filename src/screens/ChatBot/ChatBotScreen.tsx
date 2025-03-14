@@ -15,6 +15,7 @@ import { Colors } from "../../../constants/Colors";
 import { GEMINI_API_KEY } from "../../../constants/api";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { useAppInfo } from "../../../constants/appInfo";
+import { useProducts } from "../../hooks/useProducts";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { Routes } from "../../navigation/Routes";
@@ -27,13 +28,9 @@ interface Message {
 
 export default function ChatBotScreen() {
   const navigation = useNavigation<StackNavigationProp<any>>();
-  const {
-    APP_INFO,
-    generateAIContext,
-    isDataReady,
-    categories,
-    subscriptionOffers,
-  } = useAppInfo();
+  const { APP_INFO, generateAIContext } = useAppInfo();
+  const { categories, subscriptionOffers, isDataReady, findProductById } =
+    useProducts();
 
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -54,13 +51,6 @@ export default function ChatBotScreen() {
     return generateAIContext();
   }, [generateAIContext]);
 
-  // Add debug message to show data status
-  useEffect(() => {
-    console.log(
-      `ChatBotScreen - Data ready: ${isDataReady}, Categories: ${categories.length}, Products: ${subscriptionOffers.length}`
-    );
-  }, [isDataReady, categories.length, subscriptionOffers.length]);
-
   // Initialize Gemini AI and chat session only after data is ready
   useEffect(() => {
     // Only proceed if data is ready and chat hasn't been initialized yet
@@ -74,21 +64,11 @@ export default function ChatBotScreen() {
       return;
     }
 
-    console.log("Initializing chat with data...");
     const initializeChat = async () => {
       try {
         const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-        // Get context after data is ready
         const appContext = memoizedContext();
-        console.log(
-          "Context generated - Categories section preview:",
-          appContext.substring(
-            appContext.indexOf("7. Catégories disponibles"),
-            100
-          )
-        );
 
         const chatSession = model.startChat({
           history: [
@@ -145,7 +125,6 @@ export default function ChatBotScreen() {
         if (isMounted) {
           setChat(chatSession);
           setChatInitialized(true);
-          console.log("Chat session successfully initialized!");
         }
       } catch (error) {
         console.error("Error initializing chat:", error);
@@ -212,20 +191,19 @@ export default function ChatBotScreen() {
       return <Text style={styles.messageText}>{text}</Text>;
     }
 
-    // For bot messages, let's parse and find product mentions
+    // Log for debugging
+    console.log("Parsing message for product mentions:", text);
+
+    // For bot messages, use a regex to find product mentions with (ID: X) format
     const parts: JSX.Element[] = [];
     let lastIndex = 0;
 
-    // Improve regex to better match product IDs in different formats
-    // This regex specifically looks for the pattern "(ID: 123)" which is what we instructed the AI to use
-    const productRegex = /\(ID:\s*(\d+)\)/g;
+    // This regex looks for the format "Product name (ID: 123)" which is commonly used
+    const regex = /([^()]+)\s*\(ID:\s*(\d+)\)/g;
     let match;
 
-    console.log("Parsing message for product mentions:", text);
-
-    // Find all product mentions in the text
-    while ((match = productRegex.exec(text)) !== null) {
-      // Add the text before the product mention
+    while ((match = regex.exec(text)) !== null) {
+      // Add the text before this match
       if (match.index > lastIndex) {
         parts.push(
           <Text key={`text-${lastIndex}`} style={styles.messageText}>
@@ -234,64 +212,33 @@ export default function ChatBotScreen() {
         );
       }
 
-      // Extract product ID directly from the regex capture group
-      const productId = match[1];
+      // Extract the product name and ID
+      const productName = match[1].trim();
+      const productId = Number(match[2]);
 
-      // Find the actual product in our data
-      const product = subscriptionOffers.find(
-        (p) => p.id === Number(productId)
-      );
-      console.log(
-        `Found product mention with ID: ${productId}, Found match:`,
-        product ? "Yes" : "No"
-      );
-
-      // Find context (some text before the ID mention) to include in the clickable part
-      let startOfContext = Math.max(0, match.index - 40);
-      let contextText = text.substring(
-        startOfContext,
-        match.index + match[0].length
-      );
-
-      // If we started in the middle of a word, adjust to the beginning of the word
-      if (
-        startOfContext > 0 &&
-        /\w/.test(text[startOfContext]) &&
-        /\w/.test(text[startOfContext - 1])
-      ) {
-        while (startOfContext > 0 && /\w/.test(text[startOfContext - 1])) {
-          startOfContext--;
-        }
-        contextText = text.substring(
-          startOfContext,
-          match.index + match[0].length
-        );
-      }
+      // Find the product
+      const product = findProductById(productId);
 
       if (product) {
-        // Add the product mention as a clickable text
+        // Make this part clickable
         parts.push(
           <Text
             key={`product-${productId}-${match.index}`}
             style={[styles.messageText, styles.productMention]}
             onPress={() => {
-              console.log(
-                `Navigating to ProductDetail for product ID: ${productId}`
-              );
               navigation.navigate(Routes.ShopTab, {
                 screen: Routes.ProductDetail,
                 params: { product },
               });
             }}
           >
-            {contextText}
+            {match[0]}
           </Text>
         );
       } else {
-        // If product not found, just add as regular text
         parts.push(
-          <Text key={`text-nomatch-${match.index}`} style={styles.messageText}>
-            {contextText}
+          <Text key={`nomatch-${match.index}`} style={styles.messageText}>
+            {match[0]}
           </Text>
         );
       }
@@ -299,21 +246,32 @@ export default function ChatBotScreen() {
       lastIndex = match.index + match[0].length;
     }
 
-    // Add any remaining text
     if (lastIndex < text.length) {
       parts.push(
-        <Text key={`text-${lastIndex}`} style={styles.messageText}>
+        <Text key={`text-end`} style={styles.messageText}>
           {text.substring(lastIndex)}
         </Text>
       );
     }
 
+    if (parts.length > 0) {
+      return <>{parts}</>;
+    }
+
+    const hasProdReference = /produit|service|offer|subscription/i.test(text);
+
     return (
       <>
-        {parts.length > 0 ? (
-          parts
-        ) : (
-          <Text style={styles.messageText}>{text}</Text>
+        <Text style={styles.messageText}>{text}</Text>
+        {hasProdReference && (
+          <TouchableOpacity
+            style={styles.showProductsButton}
+            onPress={() => navigation.navigate(Routes.ShopTab)}
+          >
+            <Text style={styles.showProductsButtonText}>
+              Voir tous les produits
+            </Text>
+          </TouchableOpacity>
         )}
       </>
     );
@@ -444,5 +402,16 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.2)",
     borderRadius: 4,
     padding: 2,
+  },
+  showProductsButton: {
+    backgroundColor: Colors.secondary,
+    padding: 8,
+    borderRadius: 10,
+    marginTop: 8,
+    alignSelf: "flex-start",
+  },
+  showProductsButtonText: {
+    color: "white",
+    fontWeight: "600",
   },
 });

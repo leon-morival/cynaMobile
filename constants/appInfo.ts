@@ -1,61 +1,16 @@
-import { useEffect, useState, useMemo, useCallback } from "react";
-
-import { API_URL } from "./api";
-import { Category, SubscriptionOffer } from "../src/models/Entities";
+import { useMemo, useCallback } from "react";
+import { useProducts } from "../src/hooks/useProducts";
 
 export const useAppInfo = () => {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [subscriptionOffers, setSubscriptionOffers] = useState<
-    SubscriptionOffer[]
-  >([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isDataReady, setIsDataReady] = useState<boolean>(false);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const catResponse = await fetch(`${API_URL}/categories`);
-        const catData = await catResponse.json();
-
-        const offerResponse = await fetch(`${API_URL}/subscription-offers`);
-        const offerData: SubscriptionOffer[] = await offerResponse.json();
-
-        if (isMounted) {
-          setCategories(catData.member || []);
-          setSubscriptionOffers(offerData || []);
-          setIsDataReady(true);
-        }
-      } catch (error) {
-        console.error("Error fetching app data:", error);
-        if (isMounted) {
-          // Even if there's an error, we should mark data as ready so the app can proceed
-          setIsDataReady(true);
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    fetchData();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  // Log data for debugging
-  useEffect(() => {
-    if (isDataReady) {
-      console.log(
-        `Data loaded: ${categories.length} categories, ${subscriptionOffers.length} products`
-      );
-    }
-  }, [isDataReady, categories.length, subscriptionOffers.length]);
+  const {
+    categories,
+    subscriptionOffers,
+    isLoading,
+    isDataReady,
+    error,
+    findProductById,
+    getProductsByCategory,
+  } = useProducts();
 
   // Memoize APP_INFO to prevent unnecessary rerenders
   const APP_INFO = useMemo(() => {
@@ -143,10 +98,7 @@ Information sur l'application ${APP_INFO.name}:
 ${categories
   .map((category) => {
     // Count products in this category
-    const productsInCategory = subscriptionOffers.filter(
-      (offer) => offer.category_id === category.id
-    );
-
+    const productsInCategory = getProductsByCategory(category.id);
     return `  - ${category.name} - ${productsInCategory.length} produits`;
   })
   .join("\n")}
@@ -165,7 +117,7 @@ ${categories
 ${categoryProducts
   .map(
     (product) =>
-      `    - ${product.name} - Prix: ${
+      `    - ${product.name} (ID: ${product.id}) - Prix: ${
         product.price
       }€ - ${product.description.substring(0, 80)}...`
   )
@@ -178,7 +130,7 @@ ${subscriptionOffers
   .slice(0, 5)
   .map(
     (offer) => `
-  • ${offer.name}:
+  • ${offer.name} (ID: ${offer.id}):
     - Catégorie: ${categoryMap[offer.category_id] || "Non catégorisé"}
     - Prix: ${offer.price}€
     - Description complète: ${offer.description}
@@ -188,15 +140,14 @@ ${subscriptionOffers
 
 Instructions pour répondre aux questions:
 1. Utiliser ces informations pour répondre aux questions sur l'application, les catégories et les produits disponibles.
-2. Si un utilisateur demande des détails sur un produit spécifique, consultez la section "Détails des produits populaires" ou "Produits disponibles par catégorie".
+2. IMPORTANT: Quand vous mentionnez un produit, écrivez TOUJOURS son nom EXACT suivi de son ID entre parenthèses, dans ce format précis: "Service de paiement en ligne (ID: 3)". Ce format est essentiel pour que l'utilisateur puisse cliquer sur les produits mentionnés.
+3. Pour chaque produit mentionné, incluez toujours son ID comme dans l'exemple ci-dessus.
 4. Recommander les fonctionnalités pertinentes lorsque cela est approprié.
 5. Maintenir un ton professionnel et amical.
 6. Pour les questions techniques spécifiques ou problèmes, suggérer de contacter le support client.
 7. Ne pas inventer d'informations qui ne sont pas incluses dans ce contexte.
 `;
-  }, [categories, subscriptionOffers, APP_INFO]);
-
-  // Debug only a small portion of the context to avoid console clutter
+  }, [categories, subscriptionOffers, APP_INFO, getProductsByCategory]);
 
   return {
     APP_INFO,
@@ -204,6 +155,9 @@ Instructions pour répondre aux questions:
     subscriptionOffers,
     isLoading,
     isDataReady,
+    error,
+    findProductById,
+    getProductsByCategory,
     generateAIContext,
   };
 };
