@@ -188,7 +188,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#f8f8f8",
   },
   messagesContainer: {
-    marginTop: 35,
     flex: 1,
     padding: 10,
   },
