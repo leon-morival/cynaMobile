@@ -22,6 +22,9 @@ export default function ProductDetail() {
   const { params } = useRoute<ProductDetailRouteProp>();
   const product = params.product;
 
+  // Log product details for debugging
+  console.log("Displaying product details:", product.id, product.name);
+
   const addToCart = async () => {
     try {
       const storedCart = await AsyncStorage.getItem("cart");
@@ -64,7 +67,7 @@ export default function ProductDetail() {
       <Image source={{ uri: product.image_path }} style={styles.image} />
       <View style={styles.content}>
         <Text style={styles.name}>{product.name}</Text>
-        <Text style={styles.price}>${product.price}</Text>
+        <Text style={styles.price}>{product.price}€</Text>
         <Text style={styles.description}>{product.description}</Text>
         <View style={styles.buttonContainer}>
           <Button

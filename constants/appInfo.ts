@@ -147,7 +147,7 @@ ${categories
       (offer) => offer.category_id === category.id
     );
 
-    return `  - ${category.name} (ID: ${category.id}) - ${productsInCategory.length} produits`;
+    return `  - ${category.name} - ${productsInCategory.length} produits`;
   })
   .join("\n")}
 
@@ -165,7 +165,7 @@ ${categories
 ${categoryProducts
   .map(
     (product) =>
-      `    - ${product.name} (ID: ${product.id}) - Prix: ${
+      `    - ${product.name} - Prix: ${
         product.price
       }€ - ${product.description.substring(0, 80)}...`
   )
@@ -178,7 +178,7 @@ ${subscriptionOffers
   .slice(0, 5)
   .map(
     (offer) => `
-  • ${offer.name} (ID: ${offer.id}):
+  • ${offer.name}:
     - Catégorie: ${categoryMap[offer.category_id] || "Non catégorisé"}
     - Prix: ${offer.price}€
     - Description complète: ${offer.description}
@@ -189,10 +189,10 @@ ${subscriptionOffers
 Instructions pour répondre aux questions:
 1. Utiliser ces informations pour répondre aux questions sur l'application, les catégories et les produits disponibles.
 2. Si un utilisateur demande des détails sur un produit spécifique, consultez la section "Détails des produits populaires" ou "Produits disponibles par catégorie".
-3. Recommander les fonctionnalités pertinentes lorsque cela est approprié.
-4. Maintenir un ton professionnel et amical.
-5. Pour les questions techniques spécifiques ou problèmes, suggérer de contacter le support client.
-6. Ne pas inventer d'informations qui ne sont pas incluses dans ce contexte.
+4. Recommander les fonctionnalités pertinentes lorsque cela est approprié.
+5. Maintenir un ton professionnel et amical.
+6. Pour les questions techniques spécifiques ou problèmes, suggérer de contacter le support client.
+7. Ne pas inventer d'informations qui ne sont pas incluses dans ce contexte.
 `;
   }, [categories, subscriptionOffers, APP_INFO]);
 
