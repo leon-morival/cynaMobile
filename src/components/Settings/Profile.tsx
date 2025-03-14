@@ -94,7 +94,7 @@ export default function Profile({ user }: ProfileProps) {
 
           {/* Redirection vers l'écran de modification du mot de passe */}
           <TouchableOpacity
-            style={[styles.infoRow, styles.passwordChangeRow]}
+            style={[styles.infoRow]}
             onPress={handlePasswordChange}
           >
             <Ionicons
@@ -104,6 +104,22 @@ export default function Profile({ user }: ProfileProps) {
               style={styles.rowIcon}
             />
             <Text style={styles.infoValue}>Modifier le mot de passe</Text>
+            <Ionicons name="chevron-forward" size={20} color={Colors.primary} />
+          </TouchableOpacity>
+          {/* Redirection vers l'écran des conditions d'utilisation */}
+          <TouchableOpacity
+            style={[styles.infoRow, styles.passwordChangeRow]}
+            onPress={() =>
+              navigation.navigate(Routes.ConditionsScreen as never)
+            }
+          >
+            <Ionicons
+              name="document-text-outline"
+              size={20}
+              color={Colors.primary}
+              style={styles.rowIcon}
+            />
+            <Text style={styles.infoValue}>Conditions d'utilisation</Text>
             <Ionicons name="chevron-forward" size={20} color={Colors.primary} />
           </TouchableOpacity>
         </View>
