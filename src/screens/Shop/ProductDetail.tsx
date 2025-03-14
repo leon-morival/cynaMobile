@@ -31,8 +31,7 @@ export default function ProductDetail() {
       if (exists) {
         Toast.show({
           type: "info",
-          text1:
-            "Produit déjà présent dans le panier. Modifiez la quantité dans le panier!",
+          text1: "Produit déjà présent dans le panier.",
         });
         return;
       }

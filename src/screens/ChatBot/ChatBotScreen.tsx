@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -14,7 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../../../constants/Colors";
 import { GEMINI_API_KEY } from "../../../constants/api";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { generateAIContext, APP_INFO } from "../../../constants/appInfo";
+import { useAppInfo } from "../../../constants/appInfo";
 
 interface Message {
   id: string;
@@ -23,6 +23,13 @@ interface Message {
 }
 
 export default function ChatBotScreen() {
+  const {
+    APP_INFO,
+    generateAIContext,
+    isDataReady,
+    categories,
+    subscriptionOffers,
+  } = useAppInfo();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -34,23 +41,53 @@ export default function ChatBotScreen() {
   const [loading, setLoading] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
   const [chat, setChat] = useState<any>(null);
+  const [chatInitialized, setChatInitialized] = useState(false);
 
-  // Initialize Gemini AI and chat session
+  // Memoize the context generation to prevent it from changing on every render
+  const memoizedContext = useCallback(() => {
+    return generateAIContext();
+  }, [generateAIContext]);
+
+  // Add debug message to show data status
   useEffect(() => {
+    console.log(
+      `ChatBotScreen - Data ready: ${isDataReady}, Categories: ${categories.length}, Products: ${subscriptionOffers.length}`
+    );
+  }, [isDataReady, categories.length, subscriptionOffers.length]);
+
+  // Initialize Gemini AI and chat session only after data is ready
+  useEffect(() => {
+    // Only proceed if data is ready and chat hasn't been initialized yet
+    if (!isDataReady || chatInitialized) return;
+
+    let isMounted = true;
+
+    // Check if we actually have data before initializing
+    if (categories.length === 0 && subscriptionOffers.length === 0) {
+      console.log("No data available yet, waiting...");
+      return;
+    }
+
+    console.log("Initializing chat with data...");
     const initializeChat = async () => {
       try {
         const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-        // Create a chat session with history and context
-        const appContext = generateAIContext();
+        // Get context after data is ready
+        const appContext = memoizedContext();
+        console.log(
+          "Context generated - Categories section preview:",
+          appContext
+        );
+
         const chatSession = model.startChat({
           history: [
             {
               role: "user",
               parts: [
                 {
-                  text: "Voici le contexte sur l'application Cyna. Utilise ces informations pour répondre aux questions des utilisateurs.",
+                  text: "Voici le contexte sur l'application Cyna, ses catégories et produits. Utilise ces informations pour répondre aux questions des utilisateurs, notamment sur les produits et catégories spécifiques.",
                 },
               ],
             },
@@ -58,7 +95,7 @@ export default function ChatBotScreen() {
               role: "model",
               parts: [
                 {
-                  text: "Compris. Je vais utiliser ces informations pour aider les utilisateurs de l'application Cyna.",
+                  text: "Compris. Je vais utiliser ces informations pour aider les utilisateurs de l'application Cyna, en particulier concernant les détails des produits et catégories disponibles.",
                 },
               ],
             },
@@ -70,7 +107,23 @@ export default function ChatBotScreen() {
               role: "model",
               parts: [
                 {
-                  text: "Merci pour ces informations sur l'application Cyna. Je suis prêt à aider les utilisateurs avec leurs questions concernant les fonctionnalités de l'application, les produits, la livraison, les paiements, les retours et tout autre aspect de l'expérience Cyna.",
+                  text: "Merci pour ces informations détaillées sur l'application Cyna. Je suis maintenant prêt à répondre aux questions sur les fonctionnalités de l'application, les catégories disponibles, les produits spécifiques, ainsi que sur les aspects de livraison, paiement, et support client.",
+                },
+              ],
+            },
+            {
+              role: "user",
+              parts: [
+                {
+                  text: "Assure-toi de bien utiliser les informations sur les produits lorsqu'un utilisateur pose des questions sur un produit spécifique. Tu as accès à la liste complète des produits disponibles et leurs détails dans le contexte fourni.",
+                },
+              ],
+            },
+            {
+              role: "model",
+              parts: [
+                {
+                  text: "Je comprends. Je vais m'assurer d'utiliser les détails spécifiques des produits fournis dans le contexte pour répondre précisément aux questions des utilisateurs sur les produits. J'ai accès à leurs noms, descriptions, prix et catégories, et je les utiliserai pour donner des informations exactes.",
                 },
               ],
             },
@@ -80,14 +133,28 @@ export default function ChatBotScreen() {
           },
         });
 
-        setChat(chatSession);
+        if (isMounted) {
+          setChat(chatSession);
+          setChatInitialized(true);
+          console.log("Chat session successfully initialized!");
+        }
       } catch (error) {
         console.error("Error initializing chat:", error);
       }
     };
 
     initializeChat();
-  }, []);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [
+    isDataReady,
+    memoizedContext,
+    categories.length,
+    subscriptionOffers.length,
+    chatInitialized,
+  ]);
 
   const sendMessage = async () => {
     if (!inputText.trim() || !chat) return;

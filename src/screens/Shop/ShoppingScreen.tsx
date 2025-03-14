@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -7,20 +7,15 @@ import {
   TextInput,
   ActivityIndicator,
 } from "react-native";
-import { Category, SubscriptionOffer } from "../../models/Entities";
 import CategoryCard from "../../components/Categories/CategoryCard";
 import ProductCard from "../../components/Products/ProductCard";
 import { Colors } from "../../../constants/Colors";
-import { API_URL } from "../../../constants/api";
 import { Ionicons } from "@expo/vector-icons";
+import { useAppInfo } from "../../../constants/appInfo";
 
 export default function ShoppingScreen() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [subscriptionOffers, setSubscriptionOffers] = useState<
-    SubscriptionOffer[]
-  >([]);
+  const { categories, subscriptionOffers, isLoading } = useAppInfo();
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Filter offers based on search query
   const filteredOffers =
@@ -31,26 +26,6 @@ export default function ShoppingScreen() {
             offer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             offer.description.toLowerCase().includes(searchQuery.toLowerCase())
         );
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const catResponse = await fetch(`${API_URL}/categories`);
-        const catData = await catResponse.json();
-        setCategories(catData.member);
-
-        const offerResponse = await fetch(`${API_URL}/subscription-offers`);
-        const offerData: SubscriptionOffer[] = await offerResponse.json();
-        setSubscriptionOffers(offerData);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
 
   return (
     <View style={styles.container}>
