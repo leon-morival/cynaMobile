@@ -4,9 +4,7 @@ import React from "react";
 
 import { Colors } from "../../constants/Colors";
 import CartScreen from "../screens/Cart/CartScreen";
-import ChatBotScreen from "../screens/ChatBot/ChatBotScreen";
 import HomeStackNavigator from "./HomeStackNavigator";
-import { Routes } from "./Routes";
 import SettingsStackNavigator from "./SettingsStackNavigator";
 import ShopStackNavigator from "./ShopStackNavigator";
 const Tab = createBottomTabNavigator();

@@ -2,7 +2,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import {
-  Dimensions,
   Image,
   ScrollView,
   StyleSheet,
@@ -15,7 +14,6 @@ import { Routes } from "../../navigation/Routes";
 
 export default function HomeScreen() {
   const navigation = useNavigation();
-  const windowWidth = Dimensions.get("window").width;
 
   const featureList = [
     {
@@ -91,7 +89,7 @@ export default function HomeScreen() {
           <TouchableOpacity
             style={styles.shopNowButton}
             onPress={() => {
-              navigation.navigate("Shop" as never);
+              navigation.navigate(Routes.ShopTab as never);
             }}
           >
             <Text style={styles.buttonText}>Sécuriser maintenant</Text>

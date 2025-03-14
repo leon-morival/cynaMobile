@@ -15,9 +15,9 @@ export default function ConditionsScreen() {
 
         <Text style={styles.sectionTitle}>2. Description du Service</Text>
         <Text style={styles.paragraph}>
-          Notre application propose un service de [description du service]. Nous
-          nous réservons le droit de modifier, suspendre ou interrompre tout
-          aspect du service à tout moment.
+          Notre application propose des services de cybersécurité. Nous nous
+          réservons le droit de modifier, suspendre ou interrompre tout aspect
+          du service à tout moment.
         </Text>
 
         <Text style={styles.sectionTitle}>3. Confidentialité</Text>
