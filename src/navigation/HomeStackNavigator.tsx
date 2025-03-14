@@ -16,7 +16,7 @@ export default function HomeStackNavigator() {
       <Stack.Screen
         name={Routes.ChatBot}
         component={ChatBotScreen}
-        options={{ title: "Product Detail" }}
+        options={{ title: "Chat Bot" }}
       />
     </Stack.Navigator>
   );

@@ -16,7 +16,7 @@ export default function ShopStackNavigator() {
       <Stack.Screen
         name={Routes.ProductDetail}
         component={ProductDetail}
-        options={{ title: "Product Detail" }}
+        options={{ title: "Sas" }}
       />
     </Stack.Navigator>
   );
