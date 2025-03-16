@@ -23,6 +23,8 @@ export default function HomeScreen() {
       iconColor: "#7986CB", // Bleu indigo pastel
       textColor: "#5C6BC0",
       bgColor: "rgba(121, 134, 203, 0.15)",
+      description:
+        "Solutions de protection avancée pour protéger vos actifs numériques contre les menaces les plus sophistiquées.",
     },
     {
       key: "threatDetection",
@@ -31,6 +33,8 @@ export default function HomeScreen() {
       iconColor: "#81C784", // Vert pastel
       textColor: "#66BB6A",
       bgColor: "rgba(129, 199, 132, 0.15)",
+      description:
+        "Systèmes de détection proactive des menaces avec alertes en temps réel et analyses comportementales.",
     },
     {
       key: "secureAccess",
@@ -39,6 +43,8 @@ export default function HomeScreen() {
       iconColor: "#9575CD", // Violet pastel
       textColor: "#7E57C2",
       bgColor: "rgba(149, 117, 205, 0.15)",
+      description:
+        "Solutions d'accès sécurisé avec authentification multi-facteurs et contrôles d'accès basés sur les rôles.",
     },
     {
       key: "dataEncryption",
@@ -47,6 +53,8 @@ export default function HomeScreen() {
       iconColor: "#4FC3F7", // Bleu clair pastel
       textColor: "#29B6F6",
       bgColor: "rgba(79, 195, 247, 0.15)",
+      description:
+        "Technologies de chiffrement de pointe pour protéger vos données sensibles au repos et en transit.",
     },
     {
       key: "complianceTools",
@@ -55,6 +63,8 @@ export default function HomeScreen() {
       iconColor: "#FF8A65", // Orange doux
       textColor: "#FF7043",
       bgColor: "rgba(255, 138, 101, 0.15)",
+      description:
+        "Outils de conformité adaptés aux réglementations RGPD, ISO27001 et autres standards internationaux.",
     },
     {
       key: "support",
@@ -63,6 +73,8 @@ export default function HomeScreen() {
       iconColor: "#90A4AE", // Bleu-gris
       textColor: "#78909C",
       bgColor: "rgba(144, 164, 174, 0.15)",
+      description:
+        "Support technique disponible 24h/24 et 7j/7 avec des experts en cybersécurité à votre service.",
     },
   ];
 
@@ -73,7 +85,9 @@ export default function HomeScreen() {
         <View style={styles.heroSection}>
           <View style={styles.textContainer}>
             <Text style={styles.valueDealsText}>Sécurité Intransigeante</Text>
-            <Text style={styles.productsText}>Solutions SAS Cybersécurité</Text>
+            <Text style={styles.productsText}>
+              Solutions Saas Cybersécurité
+            </Text>
             <Text style={styles.savingsText}>
               Protégez votre entreprise contre les cybermenaces avec nos
               systèmes d'accès sécurisés de pointe
@@ -111,7 +125,16 @@ export default function HomeScreen() {
 
         <View style={styles.featureSection}>
           {featureList.map((feature) => (
-            <View key={feature.key} style={styles.feBox}>
+            <TouchableOpacity
+              key={feature.key}
+              style={styles.feBox}
+              onPress={() =>
+                navigation.navigate(
+                  Routes.SolutionsScreen as never,
+                  { feature } as never
+                )
+              }
+            >
               <View
                 style={[
                   styles.feImageContainer,
@@ -127,7 +150,7 @@ export default function HomeScreen() {
               <Text style={[styles.feText, { color: feature.textColor }]}>
                 {feature.title}
               </Text>
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
 
@@ -142,7 +165,7 @@ export default function HomeScreen() {
             style={styles.ctaButton}
             onPress={() => navigation.navigate(Routes.ShopTab as never)}
           >
-            <Text style={styles.ctaButtonText}>Découvrir nos SAS</Text>
+            <Text style={styles.ctaButtonText}>Découvrir nos SaaS</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
