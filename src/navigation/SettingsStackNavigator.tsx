@@ -3,6 +3,7 @@ import React from "react";
 import PasswordChange from "../screens/Settings/PasswordChange";
 import SettingsScreen from "../screens/Settings/SettingsScreen";
 import ConditionsScreen from "../screens/Settings/ConditionsScreen";
+import OrdersScreen from "../screens/Orders/OrdersScreen";
 import { Routes } from "./Routes";
 const Stack = createNativeStackNavigator();
 
@@ -23,6 +24,11 @@ export default function SettingsStackNavigator() {
         name={Routes.ConditionsScreen}
         component={ConditionsScreen}
         options={{ headerShown: true, title: "Conditions d'utilisation" }}
+      />
+      <Stack.Screen
+        name={Routes.OrdersScreen}
+        component={OrdersScreen}
+        options={{ headerShown: true, title: "Mes commandes" }}
       />
     </Stack.Navigator>
   );

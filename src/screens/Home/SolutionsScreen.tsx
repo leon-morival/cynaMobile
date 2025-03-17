@@ -95,7 +95,6 @@ export default function SolutionsScreen() {
       "Notre Support 24/7 vous garantit un accès permanent à des experts en cybersécurité, avec une résolution rapide des incidents et un accompagnement proactif pour améliorer votre sécurité.",
   };
 
-  // Get the appropriate benefits and content based on feature key
   const benefits = featureBenefits[feature.key] || [];
   const additionalContent = featureContent[feature.key] || feature.description;
 

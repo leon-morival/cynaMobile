@@ -108,7 +108,7 @@ export default function Profile({ user }: ProfileProps) {
           </TouchableOpacity>
           {/* Redirection vers l'écran des conditions d'utilisation */}
           <TouchableOpacity
-            style={[styles.infoRow, styles.passwordChangeRow]}
+            style={[styles.infoRow]}
             onPress={() =>
               navigation.navigate(Routes.ConditionsScreen as never)
             }
@@ -120,6 +120,20 @@ export default function Profile({ user }: ProfileProps) {
               style={styles.rowIcon}
             />
             <Text style={styles.infoValue}>Conditions d'utilisation</Text>
+            <Ionicons name="chevron-forward" size={20} color={Colors.primary} />
+          </TouchableOpacity>
+          {/* Mes commandes */}
+          <TouchableOpacity
+            style={[styles.infoRow, styles.passwordChangeRow]}
+            onPress={() => navigation.navigate(Routes.OrdersScreen as never)}
+          >
+            <Ionicons
+              name="repeat-outline"
+              size={20}
+              color={Colors.primary}
+              style={styles.rowIcon}
+            />
+            <Text style={styles.infoValue}>Mes Abonnements</Text>
             <Ionicons name="chevron-forward" size={20} color={Colors.primary} />
           </TouchableOpacity>
         </View>

@@ -11,6 +11,7 @@ export const CartScreen = "CartScreen";
 export const ChatBot = "ChatBot";
 export const ConditionsScreen = "ConditionsScreen";
 export const SolutionsScreen = "SolutionsScreen";
+export const OrdersScreen = "OrdersScreen";
 
 export const Routes = {
   ShoppingScreen,
@@ -26,4 +27,5 @@ export const Routes = {
   ChatBot,
   ConditionsScreen,
   SolutionsScreen,
+  OrdersScreen,
 };
