@@ -14,7 +14,7 @@ export async function createClientSubscription(
     const response = await fetch(`${API_URL}/client-subscriptions`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/ld+json",
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(subscriptions),

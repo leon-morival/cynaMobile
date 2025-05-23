@@ -11,7 +11,7 @@ export async function createPaymentIntent(
     const response = await fetch(`${API_URL}/create-payment-intent`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/ld+json",
         Authorization: `Bearer ${token}`, // updated to use dynamic token
       },
       body: JSON.stringify({

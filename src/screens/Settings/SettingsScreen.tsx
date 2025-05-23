@@ -13,16 +13,17 @@ const SettingsScreen = () => {
   const [selectedForm, setSelectedForm] = useState<"login" | "register">(
     "login"
   );
-
+  console.log("user is ", user);
   // New login handler moved from Login.tsx
   const loginHandler = async (email: string, password: string) => {
     try {
       const response = await fetch(`${API_URL}/login`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/ld+json" },
         body: JSON.stringify({ email, password }),
       });
       const data = await response.json();
+      console.log("data is : ", JSON.stringify(data, null, 2));
       if (!response.ok || data.errors) {
         const errorMsg =
           data.errors?.email && Array.isArray(data.errors.email)
@@ -85,6 +86,13 @@ const SettingsScreen = () => {
               <Text style={styles.loadingText}>
                 Chargement des informations utilisateur...
               </Text>
+              {/* Ajout du bouton Déconnexion même en mode chargement */}
+              <TouchableOpacity
+                style={styles.logoutButton}
+                onPress={logoutHandler}
+              >
+                <Text style={styles.logoutButtonText}>Déconnexion</Text>
+              </TouchableOpacity>
             </View>
           )}
         </>

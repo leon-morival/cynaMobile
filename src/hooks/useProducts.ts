@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react";
-import { Category, SubscriptionOffer } from "../models/Entities";
+import { Category, Product } from "../models/Entities";
 import { API_URL } from "../../constants/api";
 
 export const useProducts = () => {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [subscriptionOffers, setSubscriptionOffers] = useState<
-    SubscriptionOffer[]
-  >([]);
+  const [subscriptionOffers, setSubscriptionOffers] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isDataReady, setIsDataReady] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -21,18 +19,26 @@ export const useProducts = () => {
         throw new Error(`Error fetching categories: ${catResponse.status}`);
       }
       const catData = await catResponse.json();
+      console.log("Categories data:", JSON.stringify(catData, null, 2));
 
       // Fetch subscription offers
-      const offerResponse = await fetch(`${API_URL}/subscription-offers`);
+      const offerResponse = await fetch(`${API_URL}/products`);
       if (!offerResponse.ok) {
         throw new Error(
           `Error fetching subscription offers: ${offerResponse.status}`
         );
       }
-      const offerData: SubscriptionOffer[] = await offerResponse.json();
-
+      const offerData = await offerResponse.json();
+      console.log("offers data:", JSON.stringify(offerData, null, 2));
       // Update state with fetched data
-      setCategories(catData.member || []);
+      // Map API categories to expected Category shape
+      setCategories(
+        (catData.member || []).map((cat: any) => ({
+          ...cat,
+          name: cat.slug,
+          image_path: cat.image_path || null,
+        }))
+      );
       setSubscriptionOffers(offerData || []);
       setIsDataReady(true);
 
@@ -73,19 +79,19 @@ export const useProducts = () => {
   }, []);
 
   // Find a product by ID
-  const findProductById = (id: number): SubscriptionOffer | undefined => {
+  const findProductById = (id: number): Product | undefined => {
     return subscriptionOffers.find((product) => product.id === id);
   };
 
   // Get products by category
-  const getProductsByCategory = (categoryId: number): SubscriptionOffer[] => {
+  const getProductsByCategory = (categoryId: number): Product[] => {
     return subscriptionOffers.filter(
       (product) => product.category_id === categoryId
     );
   };
 
   // Search products
-  const searchProducts = (query: string): SubscriptionOffer[] => {
+  const searchProducts = (query: string): Product[] => {
     const searchTerm = query.toLowerCase().trim();
     if (!searchTerm) return subscriptionOffers;
 

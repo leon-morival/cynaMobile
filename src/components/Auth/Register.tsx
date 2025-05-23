@@ -1,5 +1,13 @@
 import React, { useState, useContext } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+} from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import Toast from "react-native-toast-message";
 import AuthInput from "../Common/AuthInput";
@@ -37,11 +45,11 @@ const Register = () => {
         civilite: registerCivilite,
       };
       if (registerCivilite === Civilite.ENT) {
-        body.siret = registerSiret;
+        body.vatNumber = registerSiret;
       }
-      const response = await fetch(`${API_URL}/register`, {
+      const response = await fetch(`${API_URL}/users`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/ld+json" },
         body: JSON.stringify(body),
       });
       const data = await response.json();
@@ -65,7 +73,7 @@ const Register = () => {
           const userResponse = await fetch(`${API_URL}/user`, {
             method: "GET",
             headers: {
-              "Content-Type": "application/json",
+              "Content-Type": "application/ld+json",
               Authorization: `Bearer ${data.token}`,
             },
           });
@@ -105,61 +113,76 @@ const Register = () => {
   };
 
   return (
-    <View style={styles.section}>
-      <View style={styles.headerContainer}>
-        <Ionicons name="person-add-outline" size={40} color={Colors.primary} />
-        <Text style={styles.sectionTitle}>Inscription</Text>
-      </View>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
+    >
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.section}>
+          <View style={styles.headerContainer}>
+            <Ionicons
+              name="person-add-outline"
+              size={40}
+              color={Colors.primary}
+            />
+            <Text style={styles.sectionTitle}>Inscription</Text>
+          </View>
 
-      <AuthInput
-        type="name"
-        label="Nom :"
-        value={registerName}
-        onChangeText={setRegisterName}
-      />
-      <AuthInput
-        type="email"
-        label="Email :"
-        value={registerEmail}
-        onChangeText={setRegisterEmail}
-      />
-      <Text style={styles.label}>Civilité :</Text>
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={registerCivilite}
-          onValueChange={(itemValue) => setRegisterCivilite(itemValue)}
-          style={styles.picker}
-        >
-          <Picker.Item label="Monsieur" value={Civilite.MR} />
-          <Picker.Item label="Madame" value={Civilite.MME} />
-          <Picker.Item label="Entreprise" value={Civilite.ENT} />
-          <Picker.Item label="Autres" value={Civilite.AUT} />
-        </Picker>
-      </View>
-      <AuthInput
-        type="password"
-        label="Mot de passe :"
-        value={registerPassword}
-        onChangeText={setRegisterPassword}
-      />
-      <AuthInput
-        type="password"
-        label="Confirmer le mot de passe :"
-        value={registerConfirmPassword}
-        onChangeText={setRegisterConfirmPassword}
-      />
-      {registerCivilite === Civilite.ENT && (
-        <AuthInput
-          type="siret"
-          label="Numéro de siret :"
-          value={registerSiret}
-          onChangeText={setRegisterSiret}
-        />
-      )}
-      <TouchableOpacity style={styles.button} onPress={registerHandler}>
-        <Text style={styles.buttonText}>S'inscrire</Text>
-      </TouchableOpacity>
-    </View>
+          <AuthInput
+            type="name"
+            label="Nom :"
+            value={registerName}
+            onChangeText={setRegisterName}
+          />
+          <AuthInput
+            type="email"
+            label="Email :"
+            value={registerEmail}
+            onChangeText={setRegisterEmail}
+          />
+          <Text style={styles.label}>Civilité :</Text>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={registerCivilite}
+              onValueChange={(itemValue) => setRegisterCivilite(itemValue)}
+              style={styles.picker}
+            >
+              <Picker.Item label="Monsieur" value={Civilite.MR} />
+              <Picker.Item label="Madame" value={Civilite.MME} />
+              <Picker.Item label="Entreprise" value={Civilite.ENT} />
+              <Picker.Item label="Autres" value={Civilite.AUT} />
+            </Picker>
+          </View>
+          <AuthInput
+            type="password"
+            label="Mot de passe :"
+            value={registerPassword}
+            onChangeText={setRegisterPassword}
+          />
+          <AuthInput
+            type="password"
+            label="Confirmer le mot de passe :"
+            value={registerConfirmPassword}
+            onChangeText={setRegisterConfirmPassword}
+          />
+          {registerCivilite === Civilite.ENT && (
+            <AuthInput
+              type="siret"
+              label="Numéro de siret :"
+              value={registerSiret}
+              onChangeText={setRegisterSiret}
+            />
+          )}
+          <TouchableOpacity style={styles.button} onPress={registerHandler}>
+            <Text style={styles.buttonText}>S'inscrire</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

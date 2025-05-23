@@ -1,9 +1,16 @@
+export interface CategoryTranslation {
+  id: number;
+  // Ajoutez d'autres champs si besoin (ex: langue, nom traduit, etc.)
+}
+
 export interface Category {
   id: number;
-  name: string;
+  slug: string;
   image_path?: string;
-  created_at: string;
-  updated_at: string;
+  createdAt?: string;
+  updatedAt?: string;
+  categoryTranslations?: CategoryTranslation[];
+  // Ajoutez d'autres champs si besoin
 }
 
 export enum Civilite {
@@ -24,10 +31,10 @@ export interface User {
   civilite: Civilite;
   siret?: string;
   role: Role;
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
 }
-export interface SubscriptionOffer {
+export interface Product {
   id: number;
   name: string;
   price: number;

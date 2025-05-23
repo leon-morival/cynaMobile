@@ -75,7 +75,7 @@ export default function PasswordChange() {
       const response = await fetch(`${API_URL}/change-password`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/ld+json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({

@@ -88,7 +88,7 @@ export default function Profile({ user }: ProfileProps) {
             />
             <Text style={styles.infoValue}>
               Date de création : &nbsp;
-              {new Date(user.created_at).toLocaleDateString("fr-FR")}
+              {new Date(user.createdAt).toLocaleDateString("fr-FR")}
             </Text>
           </View>
 

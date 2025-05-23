@@ -25,7 +25,7 @@ export default function ShoppingScreen() {
   // Handle pull-to-refresh
   const onRefresh = async () => {
     setRefreshing(true);
-    await refreshData();
+    refreshData();
     setRefreshing(false);
   };
 

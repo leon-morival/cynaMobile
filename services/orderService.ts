@@ -20,7 +20,7 @@ export const createOrder = async (
     const response = await fetch(`${API_URL}/orders`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/ld+json",
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
