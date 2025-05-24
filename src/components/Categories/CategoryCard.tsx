@@ -10,15 +10,8 @@ interface CategoryCardProps {
 const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
   return (
     <View style={styles.categoryHeader}>
-      {category.image_path ? (
-        <Image source={{ uri: category.image_path }} style={styles.image} />
-      ) : (
-        <View style={styles.imagePlaceholder}>
-          <Text style={styles.placeholderText}>{category.name.charAt(0)}</Text>
-        </View>
-      )}
       <View style={styles.titleContainer}>
-        <Text style={styles.title}>{category.name}</Text>
+        <Text style={styles.title}>{category.slug}</Text>
         <View style={styles.underline} />
       </View>
     </View>

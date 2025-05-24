@@ -66,7 +66,7 @@ export default function Profile({ user }: ProfileProps) {
             <Text style={styles.infoValue}>{civiliteLabel[user.civilite]}</Text>
           </View>
 
-          {user.siret && (
+          {user.vatNumber && (
             <View style={styles.infoRow}>
               <Ionicons
                 name="business-outline"
@@ -75,7 +75,7 @@ export default function Profile({ user }: ProfileProps) {
                 style={styles.rowIcon}
               />
               <Text style={styles.infoLabel}>SIRET:</Text>
-              <Text style={styles.infoValue}>{user.siret}</Text>
+              <Text style={styles.infoValue}>{user.vatNumber}</Text>
             </View>
           )}
 
