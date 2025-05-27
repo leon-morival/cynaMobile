@@ -66,7 +66,7 @@ export default function Profile({ user }: ProfileProps) {
             <Text style={styles.infoValue}>{civiliteLabel[user.civilite]}</Text>
           </View>
 
-          {user.vatNumber && (
+          {user.vat_number && (
             <View style={styles.infoRow}>
               <Ionicons
                 name="business-outline"
@@ -75,7 +75,7 @@ export default function Profile({ user }: ProfileProps) {
                 style={styles.rowIcon}
               />
               <Text style={styles.infoLabel}>SIRET:</Text>
-              <Text style={styles.infoValue}>{user.vatNumber}</Text>
+              <Text style={styles.infoValue}>{user.vat_number}</Text>
             </View>
           )}
 
@@ -88,7 +88,7 @@ export default function Profile({ user }: ProfileProps) {
             />
             <Text style={styles.infoValue}>
               Date de création : &nbsp;
-              {new Date(user.createdAt).toLocaleDateString("fr-FR")}
+              {new Date(user.created_at).toLocaleDateString("fr-FR")}
             </Text>
           </View>
 

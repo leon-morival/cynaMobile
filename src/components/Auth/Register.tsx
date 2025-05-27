@@ -4,8 +4,6 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
   ScrollView,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
@@ -20,10 +18,16 @@ import { Colors } from "../../../constants/Colors";
 import { API_URL } from "../../../constants/api";
 
 const Register = () => {
-  const [registerName, setRegisterName] = useState("");
-  const [registerEmail, setRegisterEmail] = useState("");
-  const [registerPassword, setRegisterPassword] = useState("");
-  const [registerConfirmPassword, setRegisterConfirmPassword] = useState("");
+  const [registerName, setRegisterName] = useState(__DEV__ ? "leon" : "");
+  const [registerEmail, setRegisterEmail] = useState(
+    __DEV__ ? "leon@gmail.com" : ""
+  );
+  const [registerPassword, setRegisterPassword] = useState(
+    __DEV__ ? "password" : ""
+  );
+  const [registerConfirmPassword, setRegisterConfirmPassword] = useState(
+    __DEV__ ? "password" : ""
+  );
   const [registerSiret, setRegisterSiret] = useState("");
   const [registerCivilite, setRegisterCivilite] = useState(Civilite.MR);
   const { token, setToken, user, setUser } = useContext(AuthContext);
@@ -45,11 +49,15 @@ const Register = () => {
         civilite: registerCivilite,
       };
       if (registerCivilite === Civilite.ENT) {
-        body.vatNumber = registerSiret;
+        body.siret = registerSiret;
       }
-      const response = await fetch(`${API_URL}/users`, {
+
+      const test = await fetch(`${API_URL}/users`);
+      const testData = await test.json();
+      console.log("Test fetch users:", testData);
+      const response = await fetch(`${API_URL}/register`, {
         method: "POST",
-        headers: { "Content-Type": "application/ld+json" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
       const data = await response.json();
@@ -73,7 +81,7 @@ const Register = () => {
           const userResponse = await fetch(`${API_URL}/user`, {
             method: "GET",
             headers: {
-              "Content-Type": "application/ld+json",
+              "Content-Type": "application/json",
               Authorization: `Bearer ${data.token}`,
             },
           });
@@ -104,6 +112,7 @@ const Register = () => {
         text2: "Inscription réussie",
       });
     } catch (error) {
+      console.log("Error during registration:", error);
       Toast.show({
         type: "error",
         text1: "Erreur",
@@ -113,80 +122,75 @@ const Register = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
-    >
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View style={styles.section}>
-          <View style={styles.headerContainer}>
-            <Ionicons
-              name="person-add-outline"
-              size={40}
-              color={Colors.primary}
-            />
-            <Text style={styles.sectionTitle}>Inscription</Text>
-          </View>
-
-          <AuthInput
-            type="name"
-            label="Nom :"
-            value={registerName}
-            onChangeText={setRegisterName}
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.section}>
+        <View style={styles.headerContainer}>
+          <Ionicons
+            name="person-add-outline"
+            size={40}
+            color={Colors.primary}
           />
-          <AuthInput
-            type="email"
-            label="Email :"
-            value={registerEmail}
-            onChangeText={setRegisterEmail}
-          />
-          <Text style={styles.label}>Civilité :</Text>
-          <View style={styles.pickerContainer}>
-            <Picker
-              selectedValue={registerCivilite}
-              onValueChange={(itemValue) => setRegisterCivilite(itemValue)}
-              style={styles.picker}
-            >
-              <Picker.Item label="Monsieur" value={Civilite.MR} />
-              <Picker.Item label="Madame" value={Civilite.MME} />
-              <Picker.Item label="Entreprise" value={Civilite.ENT} />
-              <Picker.Item label="Autres" value={Civilite.AUT} />
-            </Picker>
-          </View>
-          <AuthInput
-            type="password"
-            label="Mot de passe :"
-            value={registerPassword}
-            onChangeText={setRegisterPassword}
-          />
-          <AuthInput
-            type="password"
-            label="Confirmer le mot de passe :"
-            value={registerConfirmPassword}
-            onChangeText={setRegisterConfirmPassword}
-          />
-          {registerCivilite === Civilite.ENT && (
-            <AuthInput
-              type="siret"
-              label="Numéro de siret :"
-              value={registerSiret}
-              onChangeText={setRegisterSiret}
-            />
-          )}
-          <TouchableOpacity style={styles.button} onPress={registerHandler}>
-            <Text style={styles.buttonText}>S'inscrire</Text>
-          </TouchableOpacity>
+          <Text style={styles.sectionTitle}>Inscription</Text>
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+
+        <AuthInput
+          type="name"
+          label="Nom :"
+          value={registerName}
+          onChangeText={setRegisterName}
+        />
+        <AuthInput
+          type="email"
+          label="Email :"
+          value={registerEmail}
+          onChangeText={setRegisterEmail}
+        />
+        <Text style={styles.label}>Civilité :</Text>
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={registerCivilite}
+            onValueChange={(itemValue) => setRegisterCivilite(itemValue)}
+            style={styles.picker}
+          >
+            <Picker.Item label="Monsieur" value={Civilite.MR} />
+            <Picker.Item label="Madame" value={Civilite.MME} />
+            <Picker.Item label="Entreprise" value={Civilite.ENT} />
+            <Picker.Item label="Autres" value={Civilite.AUT} />
+          </Picker>
+        </View>
+        <AuthInput
+          type="password"
+          label="Mot de passe :"
+          value={registerPassword}
+          onChangeText={setRegisterPassword}
+        />
+        <AuthInput
+          type="password"
+          label="Confirmer le mot de passe :"
+          value={registerConfirmPassword}
+          onChangeText={setRegisterConfirmPassword}
+        />
+        {registerCivilite === Civilite.ENT && (
+          <AuthInput
+            type="siret"
+            label="Numéro de siret :"
+            value={registerSiret}
+            onChangeText={setRegisterSiret}
+          />
+        )}
+        <TouchableOpacity style={styles.button} onPress={registerHandler}>
+          <Text style={styles.buttonText}>S'inscrire</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+    paddingVertical: 20,
+  },
   section: {
     width: "90%",
     marginBottom: 30,

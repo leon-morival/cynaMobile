@@ -8,21 +8,21 @@ export interface CategoryTranslation {
 export interface Category {
   id: number;
   slug: string;
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
   categoryTranslations?: CategoryTranslation[];
 }
 
 export enum Civilite {
-  MR = "MR",
-  MME = "MME",
-  ENT = "ENT",
-  AUT = "AUT",
+  MR = "mr",
+  MME = "mme",
+  ENT = "ent",
+  AUT = "aut",
 }
 
 export enum Role {
-  ADMIN = "ADMIN",
-  USER = "USER",
+  ADMIN = "admin",
+  USER = "user",
 }
 
 export interface User {
@@ -34,9 +34,9 @@ export interface User {
   civilite: Civilite;
   company_name?: string;
   vat_number?: string;
-  address?: any; // JSON
-  createdAt: string;
-  updatedAt: string;
+  address?: any;
+  created_at: string;
+  updated_at: string;
   role: Role;
 }
 
@@ -72,8 +72,8 @@ export interface Product {
   image?: string;
   tax_rate?: number;
   category_id: number;
-  createdAt?: string;
-  updatedAt?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface ProductTranslation {
@@ -89,8 +89,8 @@ export interface Orders {
   ttc_price?: number;
   user_id: number;
   status: OrderStatus;
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface OrderItem {
@@ -104,7 +104,7 @@ export interface OrderItem {
 
 export interface Subscription {
   id: number;
-  createdAt: string;
+  created_at: string;
   user_id: number;
   order_item_id: number;
   subscription_type: SubscriptionType;
@@ -124,7 +124,7 @@ export interface Invoice {
   ttc_amount: number;
   period_start?: string;
   period_end?: string;
-  createdAt: string;
+  created_at: string;
 }
 
 export interface Payment {
@@ -135,7 +135,7 @@ export interface Payment {
   transaction_id: string;
   payment_method: string;
   subscription_id?: number;
-  createdAt?: string;
+  created_at?: string;
 }
 
 export interface Carousel {
