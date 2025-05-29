@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useProducts } from "../../hooks/useProducts";
 import { API_URL } from "../../../constants/api";
 import { useLanguage } from "../../context/LanguageContext";
+import { translate } from "../../utils/translationUtils";
 export default function ShoppingScreen() {
   const { categories, isLoading, refreshData, searchProducts } = useProducts();
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -46,7 +47,7 @@ export default function ShoppingScreen() {
         />
         <TextInput
           style={styles.searchInput}
-          placeholder="Rechercher des produits..."
+          placeholder={translate("search_products")}
           placeholderTextColor="#888"
           value={searchQuery}
           onChangeText={setSearchQuery}

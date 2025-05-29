@@ -158,7 +158,7 @@ const SettingsScreen = () => {
               ]}
               onPress={() => setSelectedForm("login")}
             >
-              <Text style={styles.buttonText}>Connexion</Text>
+              <Text style={styles.buttonText}>{translate("login")}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[
@@ -167,7 +167,9 @@ const SettingsScreen = () => {
               ]}
               onPress={() => setSelectedForm("register")}
             >
-              <Text style={styles.buttonText}>Créer un compte</Text>
+              <Text style={styles.buttonText}>
+                {translate("create_account")}
+              </Text>
             </TouchableOpacity>
           </View>
           {selectedForm === "login" ? (

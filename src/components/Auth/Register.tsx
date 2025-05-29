@@ -16,6 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../../../constants/Colors";
 
 import { API_URL } from "../../../constants/api";
+import { translate } from "../../utils/translationUtils";
 
 const Register = () => {
   const [registerName, setRegisterName] = useState(__DEV__ ? "leon" : "");
@@ -130,43 +131,43 @@ const Register = () => {
             size={40}
             color={Colors.primary}
           />
-          <Text style={styles.sectionTitle}>Inscription</Text>
+          <Text style={styles.sectionTitle}>{translate("registration")}</Text>
         </View>
 
         <AuthInput
           type="name"
-          label="Nom :"
+          label={translate("name") + " :"}
           value={registerName}
           onChangeText={setRegisterName}
         />
         <AuthInput
           type="email"
-          label="Email :"
+          label={translate("email") + " :"}
           value={registerEmail}
           onChangeText={setRegisterEmail}
         />
-        <Text style={styles.label}>Civilité :</Text>
+        <Text style={styles.label}>{translate("title") + " :"}</Text>
         <View style={styles.pickerContainer}>
           <Picker
             selectedValue={registerCivilite}
             onValueChange={(itemValue) => setRegisterCivilite(itemValue)}
             style={styles.picker}
           >
-            <Picker.Item label="Monsieur" value={Civilite.MR} />
-            <Picker.Item label="Madame" value={Civilite.MME} />
-            <Picker.Item label="Entreprise" value={Civilite.ENT} />
+            <Picker.Item label={translate("mr")} value={Civilite.MR} />
+            <Picker.Item label={translate("mrs")} value={Civilite.MME} />
+            <Picker.Item label={translate("company")} value={Civilite.ENT} />
             <Picker.Item label="Autres" value={Civilite.AUT} />
           </Picker>
         </View>
         <AuthInput
           type="password"
-          label="Mot de passe :"
+          label={translate("password") + " :"}
           value={registerPassword}
           onChangeText={setRegisterPassword}
         />
         <AuthInput
           type="password"
-          label="Confirmer le mot de passe :"
+          label={translate("confirm_password") + " :"}
           value={registerConfirmPassword}
           onChangeText={setRegisterConfirmPassword}
         />
@@ -179,7 +180,7 @@ const Register = () => {
           />
         )}
         <TouchableOpacity style={styles.button} onPress={registerHandler}>
-          <Text style={styles.buttonText}>S'inscrire</Text>
+          <Text style={styles.buttonText}>{translate("sign_up")}</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

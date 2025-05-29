@@ -4,6 +4,7 @@ import Toast from "react-native-toast-message";
 import AuthInput from "../Common/AuthInput";
 import { Colors } from "../../../constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
+import { translate } from "../../utils/translationUtils";
 
 interface LoginProps {
   onLogin: (email: string, password: string) => void;
@@ -21,23 +22,23 @@ const Login = ({ onLogin }: LoginProps) => {
     <View style={styles.section}>
       <View style={styles.headerContainer}>
         <Ionicons name="log-in-outline" size={40} color={Colors.primary} />
-        <Text style={styles.sectionTitle}>Connexion</Text>
+        <Text style={styles.sectionTitle}>{translate("login")}</Text>
       </View>
 
       <AuthInput
         type="email"
-        label="Email :"
+        label={translate("email") + " :"}
         value={loginEmail}
         onChangeText={setLoginEmail}
       />
       <AuthInput
         type="password"
-        label="Mot de passe :"
+        label={translate("password") + " :"}
         value={loginPassword}
         onChangeText={setLoginPassword}
       />
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Se connecter</Text>
+        <Text style={styles.buttonText}>{translate("log_in")}</Text>
       </TouchableOpacity>
       <Toast />
     </View>
