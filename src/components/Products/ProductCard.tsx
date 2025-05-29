@@ -12,6 +12,7 @@ import { Product } from "../../models/Entities";
 import { Colors } from "../../../constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { Routes } from "../../navigation/Routes";
+import { useLanguage } from "../../context/LanguageContext";
 
 interface ProductCardProps {
   offer: Product;
@@ -19,20 +20,18 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ offer }) => {
   const navigation = useNavigation<any>();
-  const userLanguage = "fr";
 
   const handlePress = () => {
     navigation.navigate(Routes.ProductDetail, { product: offer });
   };
 
+  // Utilisation sécurisée des champs traduits
   const translatedName =
-    offer.translations.find((t) => t.lang === userLanguage)?.name ||
-    offer.translations[0]?.name ||
-    "Unknown";
+    (offer as any).name || (offer.translations?.[0]?.name ?? "");
   const translatedDescription =
-    offer.translations.find((t) => t.lang === userLanguage)?.description ||
-    offer.translations[0]?.description ||
-    "";
+    (offer as any).description || (offer.translations?.[0]?.description ?? "");
+
+  console.log("ProductCard props:", offer); // Log the received data
 
   return (
     <TouchableOpacity
@@ -48,7 +47,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ offer }) => {
             resizeMode="cover"
           />
           <View style={styles.priceTag}>
-            <Text style={styles.priceText}>${offer.price.toFixed(2)}</Text>
+            {/* <Text style={styles.priceText}>${offer.price.toFixed(2)}</Text> */}
           </View>
         </View>
         <View style={styles.content}>

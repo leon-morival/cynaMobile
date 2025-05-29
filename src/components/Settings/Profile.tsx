@@ -5,6 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../../../constants/Colors";
 import { useNavigation } from "@react-navigation/native";
 import { Routes } from "../../navigation/Routes";
+import { translate } from "../../utils/translationUtils";
 interface ProfileProps {
   user: User;
 }
@@ -31,7 +32,7 @@ export default function Profile({ user }: ProfileProps) {
   return (
     <>
       <Text style={{ alignSelf: "center", fontSize: 26, fontWeight: "800" }}>
-        Mon compte
+        {translate("account")}
       </Text>
       <View style={styles.profileContainer}>
         <View style={styles.avatarContainer}>
@@ -87,7 +88,7 @@ export default function Profile({ user }: ProfileProps) {
               style={styles.rowIcon}
             />
             <Text style={styles.infoValue}>
-              Date de création : &nbsp;
+              {translate("creation_date")} : &nbsp;
               {new Date(user.created_at).toLocaleDateString("fr-FR")}
             </Text>
           </View>
@@ -103,7 +104,7 @@ export default function Profile({ user }: ProfileProps) {
               color={Colors.primary}
               style={styles.rowIcon}
             />
-            <Text style={styles.infoValue}>Modifier le mot de passe</Text>
+            <Text style={styles.infoValue}>{translate("change_password")}</Text>
             <Ionicons name="chevron-forward" size={20} color={Colors.primary} />
           </TouchableOpacity>
           {/* Redirection vers l'écran des conditions d'utilisation */}
@@ -119,7 +120,7 @@ export default function Profile({ user }: ProfileProps) {
               color={Colors.primary}
               style={styles.rowIcon}
             />
-            <Text style={styles.infoValue}>Conditions d'utilisation</Text>
+            <Text style={styles.infoValue}>{translate("terms_of_use")}</Text>
             <Ionicons name="chevron-forward" size={20} color={Colors.primary} />
           </TouchableOpacity>
           {/* Mes commandes */}
@@ -133,7 +134,7 @@ export default function Profile({ user }: ProfileProps) {
               color={Colors.primary}
               style={styles.rowIcon}
             />
-            <Text style={styles.infoValue}>Mes Abonnements</Text>
+            <Text style={styles.infoValue}>{translate("subscriptions")}</Text>
             <Ionicons name="chevron-forward" size={20} color={Colors.primary} />
           </TouchableOpacity>
         </View>
@@ -146,7 +147,7 @@ const styles = StyleSheet.create({
   profileContainer: {
     backgroundColor: "#fff",
     borderRadius: 10,
-    padding: 20,
+    padding: 15,
     margin: 15,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },

@@ -21,16 +21,13 @@ type ProductDetailRouteProp = RouteProp<
 export default function ProductDetail() {
   const { params } = useRoute<ProductDetailRouteProp>();
   const product = params.product;
-  const userLanguage = "fr";
 
+  // Les champs name et description sont déjà traduits dans product
   const translatedName =
-    product.translations.find((t) => t.lang === userLanguage)?.name ||
-    product.translations[0]?.name ||
-    "Unknown";
+    (product as any).name || (product.translations?.[0]?.name ?? "");
   const translatedDescription =
-    product.translations.find((t) => t.lang === userLanguage)?.description ||
-    product.translations[0]?.description ||
-    "";
+    (product as any).description ||
+    (product.translations?.[0]?.description ?? "");
 
   const addToCart = async () => {
     try {

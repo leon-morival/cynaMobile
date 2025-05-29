@@ -14,12 +14,12 @@ import { Colors } from "../../../constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { useProducts } from "../../hooks/useProducts";
 import { API_URL } from "../../../constants/api";
-
+import { useLanguage } from "../../context/LanguageContext";
 export default function ShoppingScreen() {
   const { categories, isLoading, refreshData, searchProducts } = useProducts();
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [refreshing, setRefreshing] = useState(false);
-  const userLanguage = "fr";
+  const { language: userLanguage } = useLanguage();
 
   // Filter offers based on search query
   const filteredOffers = searchProducts(searchQuery, userLanguage);
@@ -30,6 +30,9 @@ export default function ShoppingScreen() {
     refreshData();
     setRefreshing(false);
   };
+
+  console.log("Categories in ShoppingScreen:", categories);
+  console.log("Filtered offers in ShoppingScreen:", filteredOffers);
 
   return (
     <View style={styles.container}>
@@ -73,13 +76,7 @@ export default function ShoppingScreen() {
         >
           {categories && categories.length > 0 ? (
             searchQuery.trim() === "" ? (
-              // Show categories when not searching
               categories.map((category) => {
-                const categoryName =
-                  category.translations.find((t) => t.lang === userLanguage)
-                    ?.name ||
-                  category.translations[0]?.name ||
-                  "Unknown";
                 const categoryOffers = filteredOffers.filter(
                   (offer) => offer.category_id === category.id
                 );
@@ -87,11 +84,16 @@ export default function ShoppingScreen() {
                 // Skip categories with no offers
                 if (categoryOffers.length === 0) return null;
 
+                const categoryData = {
+                  ...category,
+                  translations: category.translations.filter(
+                    (t) => t.lang === userLanguage
+                  ),
+                };
+
                 return (
                   <View key={category.id} style={styles.categorySection}>
-                    <CategoryCard
-                      category={{ ...category, name: categoryName }}
-                    />
+                    <CategoryCard category={categoryData} />
                     <ScrollView
                       horizontal
                       showsHorizontalScrollIndicator={false}

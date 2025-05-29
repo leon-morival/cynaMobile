@@ -1,20 +1,31 @@
-import React, { useContext, useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useContext, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import Toast from "react-native-toast-message";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import Login from "../../components/Auth/Login";
 import Register from "../../components/Auth/Register";
-import { Colors } from "../../../constants/Colors";
-import { AuthContext } from "../../context/AuthContext";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { API_URL } from "../../../constants/api";
 import Profile from "../../components/Settings/Profile";
+
+import { Colors } from "../../../constants/Colors";
+import { API_URL } from "../../../constants/api";
+import { AuthContext } from "../../context/AuthContext";
+import { useLanguage } from "../../context/LanguageContext";
+import { translate } from "../../utils/translationUtils";
+
 const SettingsScreen = () => {
   const { token, user, setToken, setUser } = useContext(AuthContext);
+  const { language, setLanguage } = useLanguage();
   const [selectedForm, setSelectedForm] = useState<"login" | "register">(
     "login"
   );
-  console.log("user is ", user);
-  // New login handler moved from Login.tsx
+
   const loginHandler = async (email: string, password: string) => {
     try {
       const response = await fetch(`${API_URL}/login`, {
@@ -23,7 +34,6 @@ const SettingsScreen = () => {
         body: JSON.stringify({ email, password }),
       });
       const data = await response.json();
-      console.log("data is : ", JSON.stringify(data, null, 2));
       if (!response.ok || data.errors) {
         const errorMsg =
           data.errors?.email && Array.isArray(data.errors.email)
@@ -67,37 +77,79 @@ const SettingsScreen = () => {
     });
   };
 
+  const handleLanguageChange = (lang: string) => {
+    setLanguage(lang);
+  };
+
   return (
     <View style={styles.container}>
+      {/* LANGUE */}
+      <View style={styles.languageSwitcher}>
+        <TouchableOpacity
+          style={[
+            styles.languageOption,
+            language === "fr" && styles.languageOptionActive,
+          ]}
+          onPress={() => handleLanguageChange("fr")}
+        >
+          <Text style={styles.languageText}>🇫🇷 Français</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.languageOption,
+            language === "en" && styles.languageOptionActive,
+          ]}
+          onPress={() => handleLanguageChange("en")}
+        >
+          <Text style={styles.languageText}>🇬🇧 English</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.languageOption,
+            language === "es" && styles.languageOptionActive,
+          ]}
+          onPress={() => handleLanguageChange("es")}
+        >
+          <Text style={styles.languageText}>🇪🇸 Español</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* UTILISATEUR CONNECTÉ */}
       {token ? (
         <>
           {user ? (
             <>
               <Profile user={user} />
+
               <TouchableOpacity
                 style={styles.logoutButton}
                 onPress={logoutHandler}
               >
-                <Text style={styles.logoutButtonText}>Déconnexion</Text>
+                <Text style={styles.logoutButtonText}>
+                  {translate("logout")}
+                </Text>
               </TouchableOpacity>
             </>
           ) : (
             <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={Colors.primary} />
               <Text style={styles.loadingText}>
-                Chargement des informations utilisateur...
+                {translate("loading_user_info")}
               </Text>
-              {/* Ajout du bouton Déconnexion même en mode chargement */}
               <TouchableOpacity
                 style={styles.logoutButton}
                 onPress={logoutHandler}
               >
-                <Text style={styles.logoutButtonText}>Déconnexion</Text>
+                <Text style={styles.logoutButtonText}>
+                  {translate("logout")}
+                </Text>
               </TouchableOpacity>
             </View>
           )}
         </>
       ) : (
         <>
+          {/* CONNEXION/INSCRIPTION */}
           <View style={styles.toggleContainer}>
             <TouchableOpacity
               style={[
@@ -106,7 +158,7 @@ const SettingsScreen = () => {
               ]}
               onPress={() => setSelectedForm("login")}
             >
-              <Text style={styles.buttonText}>Login</Text>
+              <Text style={styles.buttonText}>Connexion</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[
@@ -115,7 +167,7 @@ const SettingsScreen = () => {
               ]}
               onPress={() => setSelectedForm("register")}
             >
-              <Text style={styles.buttonText}>Register</Text>
+              <Text style={styles.buttonText}>Créer un compte</Text>
             </TouchableOpacity>
           </View>
           {selectedForm === "login" ? (
@@ -132,15 +184,31 @@ const SettingsScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 100,
+    paddingTop: 80,
+    paddingHorizontal: 20,
     flex: 1,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#f8f8f8",
   },
-  header: {
-    fontSize: 24,
+  languageSwitcher: {
+    flexDirection: "row",
+    justifyContent: "center",
+    backgroundColor: Colors.secondary,
+    borderRadius: 26,
+    marginBottom: 30,
+    padding: 5,
+  },
+  languageOption: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 20,
+    alignItems: "center",
+  },
+  languageOptionActive: {
+    backgroundColor: Colors.primary,
+  },
+  languageText: {
     fontWeight: "bold",
-    alignSelf: "center",
-    marginBottom: 20,
+    color: "#fff",
   },
   toggleContainer: {
     flexDirection: "row",
@@ -148,10 +216,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   toggleButton: {
-    padding: 10,
+    flex: 1,
+    padding: 12,
+    backgroundColor: "#bbb",
+    borderRadius: 10,
     marginHorizontal: 5,
-    backgroundColor: "#888",
-    borderRadius: 5,
+    alignItems: "center",
   },
   activeButton: {
     backgroundColor: Colors.primary,
@@ -160,35 +230,32 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
-  profileContainer: {
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  profileTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
   logoutButton: {
-    backgroundColor: Colors.secondary,
-    padding: 10,
-    borderRadius: 5,
+    marginTop: 30,
     alignSelf: "center",
-    marginBottom: 20,
+    backgroundColor: Colors.secondary,
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    borderRadius: 10,
   },
   logoutButtonText: {
     color: "#fff",
     fontWeight: "bold",
   },
   loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
     alignItems: "center",
-    padding: 20,
+    marginTop: 40,
   },
   loadingText: {
     fontSize: 16,
     color: "#666",
+    marginTop: 10,
+  },
+  accountText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginVertical: 10,
   },
 });
 

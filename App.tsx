@@ -5,19 +5,20 @@ import { StatusBar } from "expo-status-bar";
 import Toast from "react-native-toast-message";
 import TabNavigator from "./src/navigation/TabNavigator";
 import { AuthProvider } from "./src/context/AuthContext";
+import { LanguageProvider } from "./src/context/LanguageContext";
 
 export default function App() {
   return (
-    <>
-      <SafeAreaProvider>
-        <AuthProvider>
+    <SafeAreaProvider>
+      <AuthProvider>
+        <LanguageProvider>
           <NavigationContainer>
             <TabNavigator />
             <StatusBar style="auto" />
           </NavigationContainer>
-        </AuthProvider>
-      </SafeAreaProvider>
+        </LanguageProvider>
+      </AuthProvider>
       <Toast />
-    </>
+    </SafeAreaProvider>
   );
 }

@@ -2,22 +2,25 @@ import React from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
 import { Category } from "../../models/Entities";
 import { Colors } from "../../../constants/Colors";
-
 interface CategoryCardProps {
   category: Category;
 }
 
 const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
+  // Les champs name et description sont déjà traduits dans category
+  const translatedName =
+    (category as any).name || (category.translations?.[0]?.name ?? "");
+
   return (
     <View style={styles.categoryHeader}>
       {/* Placeholder image with first letter */}
       <View style={styles.imagePlaceholder}>
         <Text style={styles.placeholderText}>
-          {category.name ? category.name.charAt(0).toUpperCase() : "?"}
+          {translatedName.charAt(0).toUpperCase()}
         </Text>
       </View>
       <View style={styles.titleContainer}>
-        <Text style={styles.title}>{category.name}</Text>
+        <Text style={styles.title}>{translatedName}</Text>
         <View style={styles.underline} />
       </View>
     </View>

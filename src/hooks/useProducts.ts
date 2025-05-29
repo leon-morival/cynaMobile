@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Category, Product } from "../models/Entities";
 import { API_URL } from "../../constants/api";
+import { useLanguage } from "../context/LanguageContext";
+import { translateEntity } from "../utils/translationUtils";
 
 export const useProducts = () => {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -9,28 +11,78 @@ export const useProducts = () => {
   const [isDataReady, setIsDataReady] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  const { language } = useLanguage();
+
   const fetchData = async () => {
     setIsLoading(true);
     setError(null);
     try {
       // Fetch categories
-      const catResponse = await fetch(`${API_URL}/categories`);
+      const catResponse = await fetch(`${API_URL}/categories?with_products`);
       if (!catResponse.ok) {
         throw new Error(`Error fetching categories: ${catResponse.status}`);
       }
-      const catData = await catResponse.json();
+      const catData: Category[] = await catResponse.json();
+
+      // Translate categories and their products
+      const translatedCategories = catData.map((category: Category) => {
+        const translatedCategory = translateEntity(
+          category.translations,
+          language,
+          category
+        );
+        translatedCategory.products = category.products.map(
+          (product: Product) => {
+            const translatedProduct = translateEntity(
+              product.translations,
+              language,
+              product
+            );
+            return {
+              ...translatedProduct,
+              name: translatedProduct.name || "",
+              description: translatedProduct.description || "",
+            };
+          }
+        );
+        return {
+          ...translatedCategory,
+          name: translatedCategory.name || "",
+          description: translatedCategory.description || "",
+        };
+      });
 
       // Fetch subscription offers
       const offerResponse = await fetch(`${API_URL}/products`);
       if (!offerResponse.ok) {
         throw new Error(`Error fetching products: ${offerResponse.status}`);
       }
-      const offerData = await offerResponse.json();
+      const offerData: Product[] = await offerResponse.json();
 
-      // Update state with fetched data
-      setCategories(catData || []);
-      setSubscriptionOffers(offerData || []);
+      // Translate products
+      const translatedOffers = offerData.map((product: Product) => {
+        const translatedProduct = translateEntity(
+          product.translations,
+          language,
+          product
+        );
+        return {
+          ...translatedProduct,
+          name: translatedProduct.name || "",
+          description: translatedProduct.description || "",
+        };
+      });
+
+      // Update state with translated data
+      setCategories(translatedCategories || []);
+      setSubscriptionOffers(translatedOffers || []);
       setIsDataReady(true);
+
+      // Debug logs
+      console.log("Categories fetched:", catData);
+      console.log("Translated categories:", translatedCategories);
+      console.log("Subscription offers fetched:", offerData);
+      console.log("Translated subscription offers:", translatedOffers);
     } catch (err) {
       console.error("Error fetching products data:", err);
       setError(err instanceof Error ? err.message : "Unknown error occurred");
