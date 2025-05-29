@@ -13,14 +13,16 @@ import ProductCard from "../../components/Products/ProductCard";
 import { Colors } from "../../../constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { useProducts } from "../../hooks/useProducts";
+import { API_URL } from "../../../constants/api";
 
 export default function ShoppingScreen() {
   const { categories, isLoading, refreshData, searchProducts } = useProducts();
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [refreshing, setRefreshing] = useState(false);
+  const userLanguage = "fr";
 
   // Filter offers based on search query
-  const filteredOffers = searchProducts(searchQuery);
+  const filteredOffers = searchProducts(searchQuery, userLanguage);
 
   // Handle pull-to-refresh
   const onRefresh = async () => {
@@ -73,6 +75,11 @@ export default function ShoppingScreen() {
             searchQuery.trim() === "" ? (
               // Show categories when not searching
               categories.map((category) => {
+                const categoryName =
+                  category.translations.find((t) => t.lang === userLanguage)
+                    ?.name ||
+                  category.translations[0]?.name ||
+                  "Unknown";
                 const categoryOffers = filteredOffers.filter(
                   (offer) => offer.category_id === category.id
                 );
@@ -82,7 +89,9 @@ export default function ShoppingScreen() {
 
                 return (
                   <View key={category.id} style={styles.categorySection}>
-                    <CategoryCard category={category} />
+                    <CategoryCard
+                      category={{ ...category, name: categoryName }}
+                    />
                     <ScrollView
                       horizontal
                       showsHorizontalScrollIndicator={false}

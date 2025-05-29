@@ -1,16 +1,18 @@
+export interface Category {
+  id: number;
+  created_at: string;
+  updated_at: string;
+  translations: CategoryTranslation[];
+}
+
 export interface CategoryTranslation {
   id: number;
   name: string;
   description: string;
   lang: string;
-}
-
-export interface Category {
-  id: number;
-  slug: string;
+  category_id: number;
   created_at: string;
   updated_at: string;
-  categoryTranslations?: CategoryTranslation[];
 }
 
 export enum Civilite {
@@ -69,11 +71,13 @@ export enum SubscriptionType {
 export interface Product {
   id: number;
   price: number;
-  image?: string;
+  image: string;
+  description?: string;
   tax_rate?: number;
   category_id: number;
-  created_at?: string;
-  updated_at?: string;
+  created_at: string;
+  updated_at: string;
+  translations: ProductTranslation[];
 }
 
 export interface ProductTranslation {

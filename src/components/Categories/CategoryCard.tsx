@@ -13,11 +13,11 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
       {/* Placeholder image with first letter */}
       <View style={styles.imagePlaceholder}>
         <Text style={styles.placeholderText}>
-          {category.slug ? category.slug.charAt(0).toUpperCase() : "?"}
+          {category.name ? category.name.charAt(0).toUpperCase() : "?"}
         </Text>
       </View>
       <View style={styles.titleContainer}>
-        <Text style={styles.title}>{category.slug}</Text>
+        <Text style={styles.title}>{category.name}</Text>
         <View style={styles.underline} />
       </View>
     </View>

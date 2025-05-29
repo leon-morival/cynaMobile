@@ -9,18 +9,28 @@ import {
 } from "react-native";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { SubscriptionOffer } from "../../models/Entities";
+import { Product } from "../../models/Entities";
 import { Colors } from "../../../constants/Colors";
 import Toast from "react-native-toast-message";
 
 type ProductDetailRouteProp = RouteProp<
-  { params: { product: SubscriptionOffer } },
+  { params: { product: Product } },
   "params"
 >;
 
 export default function ProductDetail() {
   const { params } = useRoute<ProductDetailRouteProp>();
   const product = params.product;
+  const userLanguage = "fr";
+
+  const translatedName =
+    product.translations.find((t) => t.lang === userLanguage)?.name ||
+    product.translations[0]?.name ||
+    "Unknown";
+  const translatedDescription =
+    product.translations.find((t) => t.lang === userLanguage)?.description ||
+    product.translations[0]?.description ||
+    "";
 
   const addToCart = async () => {
     try {
@@ -38,11 +48,11 @@ export default function ProductDetail() {
       // Map the product to the cart item structure
       const newItem = {
         id: product.id,
-        name: product.name,
+        name: translatedName,
         price: product.price,
         quantity: 1,
         type: "subscription",
-        url: product.image_path,
+        url: product.image,
       };
       currentCart.push(newItem);
       await AsyncStorage.setItem("cart", JSON.stringify(currentCart));
@@ -61,11 +71,11 @@ export default function ProductDetail() {
 
   return (
     <ScrollView style={styles.container}>
-      <Image source={{ uri: product.image_path }} style={styles.image} />
+      <Image source={{ uri: product.image }} style={styles.image} />
       <View style={styles.content}>
-        <Text style={styles.name}>{product.name}</Text>
+        <Text style={styles.name}>{translatedName}</Text>
         <Text style={styles.price}>{product.price}€</Text>
-        <Text style={styles.description}>{product.description}</Text>
+        <Text style={styles.description}>{translatedDescription}</Text>
         <View style={styles.buttonContainer}>
           <Button
             title="Ajouter au panier"

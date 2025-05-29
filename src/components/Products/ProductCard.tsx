@@ -8,21 +8,31 @@ import {
   Dimensions,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { SubscriptionOffer } from "../../models/Entities";
+import { Product } from "../../models/Entities";
 import { Colors } from "../../../constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { Routes } from "../../navigation/Routes";
 
 interface ProductCardProps {
-  offer: SubscriptionOffer;
+  offer: Product;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ offer }) => {
   const navigation = useNavigation<any>();
+  const userLanguage = "fr";
 
   const handlePress = () => {
     navigation.navigate(Routes.ProductDetail, { product: offer });
   };
+
+  const translatedName =
+    offer.translations.find((t) => t.lang === userLanguage)?.name ||
+    offer.translations[0]?.name ||
+    "Unknown";
+  const translatedDescription =
+    offer.translations.find((t) => t.lang === userLanguage)?.description ||
+    offer.translations[0]?.description ||
+    "";
 
   return (
     <TouchableOpacity
@@ -33,7 +43,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ offer }) => {
       <View style={styles.card}>
         <View style={styles.imageContainer}>
           <Image
-            source={{ uri: offer.image_path }}
+            source={{ uri: offer.image }}
             style={styles.image}
             resizeMode="cover"
           />
@@ -43,10 +53,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ offer }) => {
         </View>
         <View style={styles.content}>
           <Text style={styles.name} numberOfLines={1}>
-            {offer.name}
+            {translatedName}
           </Text>
           <Text style={styles.description} numberOfLines={2}>
-            {offer.description}
+            {translatedDescription}
           </Text>
           <View style={styles.footer}>
             <TouchableOpacity

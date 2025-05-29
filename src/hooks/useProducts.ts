@@ -19,38 +19,21 @@ export const useProducts = () => {
         throw new Error(`Error fetching categories: ${catResponse.status}`);
       }
       const catData = await catResponse.json();
-      console.log("Categories data:", JSON.stringify(catData, null, 2));
 
       // Fetch subscription offers
       const offerResponse = await fetch(`${API_URL}/products`);
       if (!offerResponse.ok) {
-        throw new Error(
-          `Error fetching subscription offers: ${offerResponse.status}`
-        );
+        throw new Error(`Error fetching products: ${offerResponse.status}`);
       }
       const offerData = await offerResponse.json();
-      console.log("offers data:", JSON.stringify(offerData, null, 2));
+
       // Update state with fetched data
-      // Map API categories to expected Category shape
-      setCategories(
-        (catData.member || []).map((cat: any) => ({
-          ...cat,
-          name: cat.slug,
-          image_path: cat.image_path || null,
-        }))
-      );
+      setCategories(catData || []);
       setSubscriptionOffers(offerData || []);
       setIsDataReady(true);
-
-      console.log(
-        `Data loaded: ${catData.member?.length || 0} categories, ${
-          offerData?.length || 0
-        } products`
-      );
     } catch (err) {
       console.error("Error fetching products data:", err);
       setError(err instanceof Error ? err.message : "Unknown error occurred");
-      // Even if there's an error, we should mark data as ready so the app can proceed
       setIsDataReady(true);
     } finally {
       setIsLoading(false);
@@ -91,14 +74,17 @@ export const useProducts = () => {
   };
 
   // Search products
-  const searchProducts = (query: string): Product[] => {
+  const searchProducts = (query: string, lang: string): Product[] => {
     const searchTerm = query.toLowerCase().trim();
     if (!searchTerm) return subscriptionOffers;
 
-    return subscriptionOffers.filter(
-      (product) =>
-        product.name.toLowerCase().includes(searchTerm) ||
-        product.description.toLowerCase().includes(searchTerm)
+    return subscriptionOffers.filter((product) =>
+      product.translations.some(
+        (translation) =>
+          translation.lang === lang &&
+          (translation.name.toLowerCase().includes(searchTerm) ||
+            translation.description?.toLowerCase().includes(searchTerm))
+      )
     );
   };
 
