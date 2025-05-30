@@ -11,31 +11,29 @@ export const useProducts = () => {
   const [isDataReady, setIsDataReady] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { language } = useLanguage();
-
   const fetchData = async () => {
     setIsLoading(true);
     setError(null);
     try {
       // Fetch categories
-      const catResponse = await fetch(`${API_URL}/categories?with_products`);
+      const catResponse = await fetch(`${API_URL}/categories`);
       if (!catResponse.ok) {
         throw new Error(`Error fetching categories: ${catResponse.status}`);
       }
       const catData: Category[] = await catResponse.json();
-
+      console.log("Fetched categories:", JSON.stringify(catData, null, 2));
       // Translate categories and their products
       const translatedCategories = catData.map((category: Category) => {
         const translatedCategory = translateEntity(
           category.translations,
-          language,
+
           category
         );
         translatedCategory.products = category.products.map(
           (product: Product) => {
             const translatedProduct = translateEntity(
               product.translations,
-              language,
+
               product
             );
             return {
@@ -58,12 +56,12 @@ export const useProducts = () => {
         throw new Error(`Error fetching products: ${offerResponse.status}`);
       }
       const offerData: Product[] = await offerResponse.json();
-
+      console.log("Fetched products:", JSON.stringify(offerData, null, 2));
       // Translate products
       const translatedOffers = offerData.map((product: Product) => {
         const translatedProduct = translateEntity(
           product.translations,
-          language,
+
           product
         );
         return {
@@ -77,12 +75,6 @@ export const useProducts = () => {
       setCategories(translatedCategories || []);
       setSubscriptionOffers(translatedOffers || []);
       setIsDataReady(true);
-
-      // Debug logs
-      console.log("Categories fetched:", catData);
-      console.log("Translated categories:", translatedCategories);
-      console.log("Subscription offers fetched:", offerData);
-      console.log("Translated subscription offers:", translatedOffers);
     } catch (err) {
       console.error("Error fetching products data:", err);
       setError(err instanceof Error ? err.message : "Unknown error occurred");

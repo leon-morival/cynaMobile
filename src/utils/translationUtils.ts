@@ -71,9 +71,10 @@ export function translate(
 
 export function translateEntity(
   translations: any[],
-  language: string,
+
   entity: any
 ) {
+  const { language } = useLanguage();
   const translation = translations.find((t) => t.lang === language);
   if (!translation) {
     return entity;
