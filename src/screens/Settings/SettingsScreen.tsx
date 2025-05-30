@@ -17,9 +17,10 @@ import { Colors } from "../../../constants/Colors";
 import { API_URL } from "../../../constants/api";
 import { AuthContext } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
-import { translate } from "../../utils/translationUtils";
+import { useTranslate } from "../../utils/translationUtils";
 
 const SettingsScreen = () => {
+  const translate = useTranslate();
   const { token, user, setToken, setUser } = useContext(AuthContext);
   const { language, setLanguage } = useLanguage();
   const [selectedForm, setSelectedForm] = useState<"login" | "register">(

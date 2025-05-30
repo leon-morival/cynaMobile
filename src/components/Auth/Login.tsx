@@ -4,13 +4,13 @@ import Toast from "react-native-toast-message";
 import AuthInput from "../Common/AuthInput";
 import { Colors } from "../../../constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
-import { translate } from "../../utils/translationUtils";
-
+import { useTranslate } from "../../utils/translationUtils";
 interface LoginProps {
   onLogin: (email: string, password: string) => void;
 }
 
 const Login = ({ onLogin }: LoginProps) => {
+  const translate = useTranslate();
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
 

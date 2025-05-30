@@ -35,7 +35,8 @@ async function fetchTranslations(): Promise<
   }
 }
 
-export function translate(key: string): string {
+// Hook personnalisé pour la traduction
+export function useTranslate() {
   const { language } = useLanguage();
   const [translations, setTranslations] = useState<Record<
     string,
@@ -46,10 +47,25 @@ export function translate(key: string): string {
     fetchTranslations().then(setTranslations);
   }, []);
 
+  function translate(key: string): string {
+    if (!translations) {
+      return "";
+    }
+    return translations[key]?.[language] || "";
+  }
+
+  return translate;
+}
+
+// Fonction utilitaire pure (sans hooks)
+export function translate(
+  key: string,
+  translations: Record<string, Record<string, string>> | null | undefined,
+  language: string
+): string {
   if (!translations) {
     return "";
   }
-
   return translations[key]?.[language] || "";
 }
 

@@ -24,7 +24,7 @@ import { Dropdown } from "react-native-element-dropdown";
 import { useCart, SubscriptionType } from "../../hooks/useCart";
 import { usePayment } from "../../hooks/usePayment";
 import { Routes } from "../../navigation/Routes";
-
+import { useTranslate } from "../../utils/translationUtils";
 // Create data for the dropdown
 const subscriptionTypeData = [
   { label: "Mensuel", value: "monthly" },
@@ -32,6 +32,7 @@ const subscriptionTypeData = [
 ];
 console.log("env variable", process.env.TEST);
 export default function CartScreen() {
+  const translate = useTranslate();
   const navigation = useNavigation();
   const [token, setToken] = useState<string | null>(null);
 
@@ -149,12 +150,14 @@ export default function CartScreen() {
           color="#fff"
           style={styles.emptyIcon}
         />
-        <Text style={styles.emptyText}>Votre panier est vide</Text>
+        <Text style={styles.emptyText}>{translate("your_cart_is_empty")}</Text>
         <TouchableOpacity
           style={styles.shopButton}
           onPress={() => navigation.navigate(Routes.ShopTab as never)}
         >
-          <Text style={styles.shopButtonText}>Continuer mes achats</Text>
+          <Text style={styles.shopButtonText}>
+            {translate("continue_shopping")}
+          </Text>
         </TouchableOpacity>
       </View>
     );

@@ -5,7 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../../../constants/Colors";
 import { useNavigation } from "@react-navigation/native";
 import { Routes } from "../../navigation/Routes";
-import { translate } from "../../utils/translationUtils";
+import { useTranslate } from "../../utils/translationUtils";
 interface ProfileProps {
   user: User;
 }
@@ -28,7 +28,7 @@ export default function Profile({ user }: ProfileProps) {
   const handlePasswordChange = () => {
     navigation.navigate(Routes.PasswordChange as never);
   };
-
+  const translate = useTranslate();
   return (
     <>
       <Text style={{ alignSelf: "center", fontSize: 26, fontWeight: "800" }}>

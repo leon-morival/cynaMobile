@@ -16,8 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../../../constants/Colors";
 
 import { API_URL } from "../../../constants/api";
-import { translate } from "../../utils/translationUtils";
-
+import { useTranslate } from "../../utils/translationUtils";
 const Register = () => {
   const [registerName, setRegisterName] = useState(__DEV__ ? "leon" : "");
   const [registerEmail, setRegisterEmail] = useState(
@@ -121,7 +120,7 @@ const Register = () => {
       });
     }
   };
-
+  const translate = useTranslate();
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.section}>

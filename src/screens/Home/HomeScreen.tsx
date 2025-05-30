@@ -11,14 +11,16 @@ import {
 } from "react-native";
 import { Colors } from "../../../constants/Colors";
 import { Routes } from "../../navigation/Routes";
+import { useTranslate } from "../../utils/translationUtils";
 
 export default function HomeScreen() {
+  const translate = useTranslate();
   const navigation = useNavigation();
 
   const featureList = [
     {
       key: "advancedSecurity",
-      title: "Protection Avancée",
+      title: translate("advanced_protection"),
       icon: "shield-checkmark-outline",
       iconColor: "#7986CB", // Bleu indigo pastel
       textColor: "#5C6BC0",
@@ -28,7 +30,7 @@ export default function HomeScreen() {
     },
     {
       key: "threatDetection",
-      title: "Détection Menaces",
+      title: translate("threat_detection"),
       icon: "scan-outline",
       iconColor: "#81C784", // Vert pastel
       textColor: "#66BB6A",
@@ -38,7 +40,7 @@ export default function HomeScreen() {
     },
     {
       key: "secureAccess",
-      title: "Accès Sécurisé",
+      title: translate("secure_access"),
       icon: "key-outline",
       iconColor: "#9575CD", // Violet pastel
       textColor: "#7E57C2",
@@ -48,7 +50,7 @@ export default function HomeScreen() {
     },
     {
       key: "dataEncryption",
-      title: "Chiffrement",
+      title: translate("encryption"),
       icon: "lock-closed-outline",
       iconColor: "#4FC3F7", // Bleu clair pastel
       textColor: "#29B6F6",
@@ -58,7 +60,7 @@ export default function HomeScreen() {
     },
     {
       key: "complianceTools",
-      title: "Conformité",
+      title: translate("compliance"),
       icon: "checkmark-circle-outline",
       iconColor: "#FF8A65", // Orange doux
       textColor: "#FF7043",
@@ -68,7 +70,7 @@ export default function HomeScreen() {
     },
     {
       key: "support",
-      title: "Support 24/7",
+      title: translate("support_24_7"),
       icon: "headset-outline",
       iconColor: "#90A4AE", // Bleu-gris
       textColor: "#78909C",
@@ -84,13 +86,14 @@ export default function HomeScreen() {
         {/* Hero Section */}
         <View style={styles.heroSection}>
           <View style={styles.textContainer}>
-            <Text style={styles.valueDealsText}>Sécurité Intransigeante</Text>
+            <Text style={styles.valueDealsText}>
+              {translate("uncompromising_security")}
+            </Text>
             <Text style={styles.productsText}>
-              Solutions Saas Cybersécurité
+              {translate("saas_solutions") + " " + translate("cybersecurity")}
             </Text>
             <Text style={styles.savingsText}>
-              Protégez votre entreprise contre les cybermenaces avec nos
-              systèmes d'accès sécurisés de pointe
+              {translate("protect_your_business_from_cyber_threats")}
             </Text>
           </View>
 
@@ -106,7 +109,7 @@ export default function HomeScreen() {
               navigation.navigate(Routes.ShopTab as never);
             }}
           >
-            <Text style={styles.buttonText}>Sécuriser maintenant</Text>
+            <Text style={styles.buttonText}>{translate("secure_now")}</Text>
             <Ionicons
               name="arrow-forward"
               size={20}
@@ -119,7 +122,7 @@ export default function HomeScreen() {
         {/* Features Section */}
         <View style={styles.sectionTitle}>
           <Text style={styles.sectionTitleText}>
-            Nos solutions de cybersécurité
+            {translate("our_cybersecurity_solutions")}
           </Text>
         </View>
 
@@ -129,10 +132,7 @@ export default function HomeScreen() {
               key={feature.key}
               style={styles.feBox}
               onPress={() =>
-                navigation.navigate(
-                  Routes.SolutionsScreen as never,
-                  { feature } as never
-                )
+                navigation.navigate(Routes.SolutionsScreen, { feature })
               }
             >
               <View
@@ -156,16 +156,19 @@ export default function HomeScreen() {
 
         {/* Call to action section */}
         <View style={styles.ctaSection}>
-          <Text style={styles.ctaTitle}>Protection Entreprise</Text>
+          <Text style={styles.ctaTitle}>
+            {translate("enterprise_protection")}
+          </Text>
           <Text style={styles.ctaSubtitle}>
-            Des SAS d'accès sécurisés pour protéger vos données sensibles et
-            infrastructures critiques
+            {translate("secure_access_saas")}
           </Text>
           <TouchableOpacity
             style={styles.ctaButton}
             onPress={() => navigation.navigate(Routes.ShopTab as never)}
           >
-            <Text style={styles.ctaButtonText}>Découvrir nos SaaS</Text>
+            <Text style={styles.ctaButtonText}>
+              {translate("discover_our_saas")}
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

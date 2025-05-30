@@ -10,6 +10,7 @@ import {
   SafeAreaView,
 } from "react-native";
 import { Colors } from "../../../constants/Colors";
+import { useTranslate } from "../../utils/translationUtils";
 
 type RouteParams = {
   feature: {
@@ -24,6 +25,7 @@ type RouteParams = {
 };
 
 export default function SolutionsScreen() {
+  const translate = useTranslate();
   const route = useRoute<RouteProp<{ params: RouteParams }, "params">>();
   const navigation = useNavigation();
 
@@ -33,7 +35,7 @@ export default function SolutionsScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <Text style={styles.errorText}>
-          Information sur la solution non disponible
+          {translate("information_not_available")}
         </Text>
       </SafeAreaView>
     );
@@ -42,57 +44,51 @@ export default function SolutionsScreen() {
   // Define feature-specific benefits
   const featureBenefits = {
     advancedSecurity: [
-      "Détection avancée des intrusions et attaques",
-      "Protection en temps réel contre les menaces connues et inconnues",
-      "Analyse comportementale et prédictive",
-      "Mise à jour automatique des signatures de sécurité",
+      translate("advanced_security_benefit_1"),
+      translate("advanced_security_benefit_2"),
+      translate("advanced_security_benefit_3"),
+      translate("advanced_security_benefit_4"),
     ],
     threatDetection: [
-      "Détection précoce des activités suspectes",
-      "Analyse de trafic réseau en temps réel",
-      "Identification des comportements anormaux",
-      "Réduction du temps moyen de détection des menaces",
+      translate("threat_detection_benefit_1"),
+      translate("threat_detection_benefit_2"),
+      translate("threat_detection_benefit_3"),
+      translate("threat_detection_benefit_4"),
     ],
     secureAccess: [
-      "Authentification multi-facteurs robuste",
-      "Gestion centralisée des identités et des accès",
-      "Contrôle granulaire basé sur les rôles",
-      "Traçabilité complète des accès aux ressources sensibles",
+      translate("secure_access_benefit_1"),
+      translate("secure_access_benefit_2"),
+      translate("secure_access_benefit_3"),
+      translate("secure_access_benefit_4"),
     ],
     dataEncryption: [
-      "Protection des données au repos et en transit",
-      "Chiffrement de bout en bout conforme aux standards",
-      "Gestion sécurisée des clés de chiffrement",
-      "Conformité aux exigences réglementaires",
+      translate("data_encryption_benefit_1"),
+      translate("data_encryption_benefit_2"),
+      translate("data_encryption_benefit_3"),
+      translate("data_encryption_benefit_4"),
     ],
     complianceTools: [
-      "Tableaux de bord de conformité en temps réel",
-      "Documentation automatisée pour les audits",
-      "Gestion des risques et des vulnérabilités",
-      "Adaptation aux évolutions réglementaires",
+      translate("compliance_tools_benefit_1"),
+      translate("compliance_tools_benefit_2"),
+      translate("compliance_tools_benefit_3"),
+      translate("compliance_tools_benefit_4"),
     ],
     support: [
-      "Assistance 24/7 par des experts certifiés",
-      "Temps de réponse garanti par SLA",
-      "Support multilingue et multi-canal",
-      "Formation et accompagnement personnalisés",
+      translate("support_benefit_1"),
+      translate("support_benefit_2"),
+      translate("support_benefit_3"),
+      translate("support_benefit_4"),
     ],
   };
 
   // Additional content texts for each feature
   const featureContent = {
-    advancedSecurity:
-      "Notre solution de Protection Avancée utilise l'intelligence artificielle et le machine learning pour identifier et neutraliser les menaces sophistiquées avant qu'elles n'affectent votre infrastructure.",
-    threatDetection:
-      "Notre système de Détection des Menaces combine l'analyse comportementale, la détection d'anomalies et des règles expertes pour identifier les menaces émergentes et les tentatives d'intrusion.",
-    secureAccess:
-      "Nos solutions d'Accès Sécurisé offrent un équilibre parfait entre sécurité robuste et expérience utilisateur fluide, avec des mécanismes d'authentification adaptés à vos besoins spécifiques.",
-    dataEncryption:
-      "Notre technologie de Chiffrement protège vos données sensibles grâce aux algorithmes les plus récents et à une gestion sécurisée des clés, tout en maintenant des performances optimales.",
-    complianceTools:
-      "Nos Outils de Conformité simplifient le respect des réglementations en automatisant la collecte de preuves, les rapports et en fournissant une visibilité continue sur votre posture de sécurité.",
-    support:
-      "Notre Support 24/7 vous garantit un accès permanent à des experts en cybersécurité, avec une résolution rapide des incidents et un accompagnement proactif pour améliorer votre sécurité.",
+    advancedSecurity: translate("advanced_security_description"),
+    threatDetection: translate("threat_detection_description"),
+    secureAccess: translate("secure_access_description"),
+    dataEncryption: translate("data_encryption_description"),
+    complianceTools: translate("compliance_tools_description"),
+    support: translate("support_description"),
   };
 
   const benefits = featureBenefits[feature.key] || [];
@@ -106,7 +102,7 @@ export default function SolutionsScreen() {
           onPress={() => navigation.goBack()}
         >
           <Ionicons name="arrow-back" size={24} color="white" />
-          <Text style={styles.backText}>Retour</Text>
+          <Text style={styles.backText}>{translate("back")}</Text>
         </TouchableOpacity>
 
         <View style={styles.header}>
@@ -124,7 +120,9 @@ export default function SolutionsScreen() {
           <Text style={styles.description}>{additionalContent}</Text>
 
           <View style={styles.benefitsSection}>
-            <Text style={styles.sectionTitle}>Avantages</Text>
+            <Text style={styles.sectionTitle}>
+              {translate("benefits_title")}
+            </Text>
             <View style={styles.benefitsList}>
               {benefits.map((benefit, index) => (
                 <View key={index} style={styles.benefitItem}>
@@ -140,7 +138,7 @@ export default function SolutionsScreen() {
           </View>
 
           <View style={styles.useCasesSection}>
-            <Text style={styles.sectionTitle}>Idéal pour</Text>
+            <Text style={styles.sectionTitle}>{translate("ideal_for")}</Text>
             <View style={styles.useCaseChips}>
               <View
                 style={[
@@ -186,7 +184,9 @@ export default function SolutionsScreen() {
           </View>
 
           <TouchableOpacity style={styles.contactButton}>
-            <Text style={styles.contactButtonText}>Demander un devis</Text>
+            <Text style={styles.contactButtonText}>
+              {translate("request_quote")}
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
