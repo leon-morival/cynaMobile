@@ -58,7 +58,7 @@ export function useTranslate() {
 }
 
 // Fonction utilitaire pure (sans hooks)
-export function translate(
+function translate(
   key: string,
   translations: Record<string, Record<string, string>> | null | undefined,
   language: string

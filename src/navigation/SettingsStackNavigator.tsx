@@ -5,9 +5,11 @@ import SettingsScreen from "../screens/Settings/SettingsScreen";
 import ConditionsScreen from "../screens/Settings/ConditionsScreen";
 import OrdersScreen from "../screens/Orders/OrdersScreen";
 import { Routes } from "./Routes";
+import { useTranslate } from "../utils/translationUtils";
 const Stack = createNativeStackNavigator();
 
 export default function SettingsStackNavigator() {
+  const translate = useTranslate();
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -18,12 +20,12 @@ export default function SettingsStackNavigator() {
       <Stack.Screen
         name={Routes.PasswordChange}
         component={PasswordChange}
-        options={{ title: "Modifier le mot de passe", headerShown: true }}
+        options={{ title: translate("change_password"), headerShown: true }}
       />
       <Stack.Screen
         name={Routes.ConditionsScreen}
         component={ConditionsScreen}
-        options={{ headerShown: true, title: "Conditions d'utilisation" }}
+        options={{ headerShown: true, title: translate("terms_of_use") }}
       />
       <Stack.Screen
         name={Routes.OrdersScreen}

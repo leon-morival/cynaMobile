@@ -6,7 +6,7 @@ import { translateEntity } from "../utils/translationUtils";
 
 export const useProducts = () => {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [subscriptionOffers, setSubscriptionOffers] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isDataReady, setIsDataReady] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -21,59 +21,15 @@ export const useProducts = () => {
         throw new Error(`Error fetching categories: ${catResponse.status}`);
       }
       const catData: Category[] = await catResponse.json();
-      console.log("Fetched categories:", JSON.stringify(catData, null, 2));
-      // Translate categories and their products
-      const translatedCategories = catData.map((category: Category) => {
-        const translatedCategory = translateEntity(
-          category.translations,
 
-          category
-        );
-        translatedCategory.products = category.products.map(
-          (product: Product) => {
-            const translatedProduct = translateEntity(
-              product.translations,
-
-              product
-            );
-            return {
-              ...translatedProduct,
-              name: translatedProduct.name || "",
-              description: translatedProduct.description || "",
-            };
-          }
-        );
-        return {
-          ...translatedCategory,
-          name: translatedCategory.name || "",
-          description: translatedCategory.description || "",
-        };
-      });
-
-      // Fetch subscription offers
       const offerResponse = await fetch(`${API_URL}/products`);
       if (!offerResponse.ok) {
         throw new Error(`Error fetching products: ${offerResponse.status}`);
       }
-      const offerData: Product[] = await offerResponse.json();
-      console.log("Fetched products:", JSON.stringify(offerData, null, 2));
-      // Translate products
-      const translatedOffers = offerData.map((product: Product) => {
-        const translatedProduct = translateEntity(
-          product.translations,
+      const productsData: Product[] = await offerResponse.json();
 
-          product
-        );
-        return {
-          ...translatedProduct,
-          name: translatedProduct.name || "",
-          description: translatedProduct.description || "",
-        };
-      });
-
-      // Update state with translated data
-      setCategories(translatedCategories || []);
-      setSubscriptionOffers(translatedOffers || []);
+      setCategories(catData || []);
+      setProducts(productsData || []);
       setIsDataReady(true);
     } catch (err) {
       console.error("Error fetching products data:", err);
@@ -107,22 +63,20 @@ export const useProducts = () => {
 
   // Find a product by ID
   const findProductById = (id: number): Product | undefined => {
-    return subscriptionOffers.find((product) => product.id === id);
+    return products.find((product) => product.id === id);
   };
 
   // Get products by category
   const getProductsByCategory = (categoryId: number): Product[] => {
-    return subscriptionOffers.filter(
-      (product) => product.category_id === categoryId
-    );
+    return products.filter((product) => product.category_id === categoryId);
   };
 
   // Search products
   const searchProducts = (query: string, lang: string): Product[] => {
     const searchTerm = query.toLowerCase().trim();
-    if (!searchTerm) return subscriptionOffers;
+    if (!searchTerm) return products;
 
-    return subscriptionOffers.filter((product) =>
+    return products.filter((product) =>
       product.translations.some(
         (translation) =>
           translation.lang === lang &&
@@ -139,7 +93,7 @@ export const useProducts = () => {
 
   return {
     categories,
-    subscriptionOffers,
+    products,
     isLoading,
     isDataReady,
     error,

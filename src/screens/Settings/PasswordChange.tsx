@@ -12,6 +12,7 @@ import { Colors } from "../../../constants/Colors";
 import { API_URL } from "../../../constants/api";
 import { AuthContext } from "../../context/AuthContext";
 import Toast from "react-native-toast-message";
+import { useTranslate } from "../../utils/translationUtils";
 
 export default function PasswordChange() {
   const { token } = useContext(AuthContext);
@@ -20,6 +21,7 @@ export default function PasswordChange() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
+  const translate = useTranslate();
 
   const handleChangePassword = async () => {
     try {
@@ -130,7 +132,6 @@ export default function PasswordChange() {
     <ScrollView style={styles.container}>
       <View style={styles.formContainer}>
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Mot de passe actuel</Text>
           <TextInput
             style={[
               styles.input,
@@ -139,7 +140,7 @@ export default function PasswordChange() {
             value={currentPassword}
             onChangeText={setCurrentPassword}
             secureTextEntry
-            placeholder="Votre mot de passe actuel"
+            placeholder={translate("current_password")}
           />
           {errors.current_password && (
             <Text style={styles.errorText}>{errors.current_password}</Text>
@@ -147,13 +148,12 @@ export default function PasswordChange() {
         </View>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Nouveau mot de passe</Text>
           <TextInput
             style={[styles.input, errors.password ? styles.inputError : null]}
             value={newPassword}
             onChangeText={setNewPassword}
             secureTextEntry
-            placeholder="Votre nouveau mot de passe"
+            placeholder={translate("new_password")}
           />
           {errors.password && (
             <Text style={styles.errorText}>{errors.password}</Text>
@@ -161,7 +161,6 @@ export default function PasswordChange() {
         </View>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Confirmez le nouveau mot de passe</Text>
           <TextInput
             style={[
               styles.input,
@@ -170,7 +169,7 @@ export default function PasswordChange() {
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             secureTextEntry
-            placeholder="Confirmer votre nouveau mot de passe"
+            placeholder={translate("confirm_new_password")}
           />
           {errors.password_confirmation && (
             <Text style={styles.errorText}>{errors.password_confirmation}</Text>
@@ -185,7 +184,9 @@ export default function PasswordChange() {
           {isLoading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.buttonText}>Modifier le mot de passe</Text>
+            <Text style={styles.buttonText}>
+              {translate("change_password")}
+            </Text>
           )}
         </TouchableOpacity>
       </View>

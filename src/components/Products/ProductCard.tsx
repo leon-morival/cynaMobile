@@ -12,7 +12,7 @@ import { Product } from "../../models/Entities";
 import { Colors } from "../../../constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { Routes } from "../../navigation/Routes";
-import { useLanguage } from "../../context/LanguageContext";
+import { translateEntity } from "../../utils/translationUtils";
 
 interface ProductCardProps {
   offer: Product;
@@ -21,17 +21,13 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ offer }) => {
   const navigation = useNavigation<any>();
 
+  const translatedOffer = translateEntity(offer.translations, offer);
+  const translatedName = translatedOffer.name || "";
+  const translatedDescription = translatedOffer.description || "";
+
   const handlePress = () => {
     navigation.navigate(Routes.ProductDetail, { product: offer });
   };
-
-  // Utilisation sécurisée des champs traduits
-  const translatedName =
-    (offer as any).name || (offer.translations?.[0]?.name ?? "");
-  const translatedDescription =
-    (offer as any).description || (offer.translations?.[0]?.description ?? "");
-
-  console.log("ProductCard props:", offer); // Log the received data
 
   return (
     <TouchableOpacity

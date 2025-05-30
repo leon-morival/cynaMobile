@@ -10,13 +10,6 @@ interface ProfileProps {
   user: User;
 }
 
-const civiliteLabel = {
-  [Civilite.MR]: "Monsieur",
-  [Civilite.MME]: "Madame",
-  [Civilite.ENT]: "Entreprise",
-  [Civilite.AUT]: "Autre",
-};
-
 const roleLabel = {
   [Role.ADMIN]: "Administrateur",
   [Role.USER]: "Utilisateur",
@@ -24,11 +17,27 @@ const roleLabel = {
 
 export default function Profile({ user }: ProfileProps) {
   const navigation = useNavigation();
+  const translate = useTranslate();
+
+  // Fonction pour obtenir la traduction de la civilité
+  const getCiviliteLabel = (civilite: Civilite) => {
+    switch (civilite) {
+      case Civilite.MR:
+        return translate("mr");
+      case Civilite.MME:
+        return translate("mme");
+      case Civilite.ENT:
+        return translate("ent");
+      case Civilite.AUT:
+        return "aut";
+      default:
+        return civilite;
+    }
+  };
 
   const handlePasswordChange = () => {
     navigation.navigate(Routes.PasswordChange as never);
   };
-  const translate = useTranslate();
   return (
     <>
       <Text style={{ alignSelf: "center", fontSize: 26, fontWeight: "800" }}>
@@ -64,7 +73,9 @@ export default function Profile({ user }: ProfileProps) {
               color={Colors.primary}
               style={styles.rowIcon}
             />
-            <Text style={styles.infoValue}>{civiliteLabel[user.civilite]}</Text>
+            <Text style={styles.infoValue}>
+              {getCiviliteLabel(user.civilite)}
+            </Text>
           </View>
 
           {user.vat_number && (

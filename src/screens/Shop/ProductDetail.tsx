@@ -12,6 +12,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Product } from "../../models/Entities";
 import { Colors } from "../../../constants/Colors";
 import Toast from "react-native-toast-message";
+import { translateEntity } from "../../utils/translationUtils";
+import { useLanguage } from "../../context/LanguageContext";
 
 type ProductDetailRouteProp = RouteProp<
   { params: { product: Product } },
@@ -21,13 +23,12 @@ type ProductDetailRouteProp = RouteProp<
 export default function ProductDetail() {
   const { params } = useRoute<ProductDetailRouteProp>();
   const product = params.product;
+  const { language } = useLanguage();
 
-  // Les champs name et description sont déjà traduits dans product
-  const translatedName =
-    (product as any).name || (product.translations?.[0]?.name ?? "");
-  const translatedDescription =
-    (product as any).description ||
-    (product.translations?.[0]?.description ?? "");
+  // Utilise translateEntity pour la traduction selon la langue courante
+  const translatedProduct = translateEntity(product.translations, product);
+  const translatedName = translatedProduct.name || "";
+  const translatedDescription = translatedProduct.description || "";
 
   const addToCart = async () => {
     try {
