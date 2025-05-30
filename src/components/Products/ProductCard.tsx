@@ -21,6 +21,16 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ offer }) => {
   const navigation = useNavigation<any>();
 
+  // Fonction utilitaire pour obtenir le prix à afficher
+  const getDisplayPrice = () => {
+    if (offer.monthly_price != null) return offer.monthly_price;
+    if (offer.annual_price != null) return offer.annual_price;
+    if (offer.lifetime_price != null) return offer.lifetime_price;
+    return null;
+  };
+
+  const displayPrice = getDisplayPrice();
+
   const translatedOffer = translateEntity(offer.translations, offer);
   const translatedName = translatedOffer.name || "";
   const translatedDescription = translatedOffer.description || "";
@@ -43,7 +53,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ offer }) => {
             resizeMode="cover"
           />
           <View style={styles.priceTag}>
-            {/* <Text style={styles.priceText}>${offer.price.toFixed(2)}</Text> */}
+            {displayPrice !== null && (
+              <Text style={styles.priceText}>{displayPrice}€</Text>
+            )}
           </View>
         </View>
         <View style={styles.content}>

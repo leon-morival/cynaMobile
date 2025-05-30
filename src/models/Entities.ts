@@ -70,7 +70,9 @@ export enum SubscriptionType {
 
 export interface Product {
   id: number;
-  price: number;
+  monthly_price: number | null;
+  annual_price: number | null;
+  lifetime_price: number | null;
   image: string;
   description?: string;
   tax_rate?: number;

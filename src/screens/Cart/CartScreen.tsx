@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   StyleSheet,
   View,
@@ -8,166 +8,45 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-
-import { initStripe } from "@stripe/stripe-react-native";
-import { createClientSubscription } from "../../../services/subscriptionService";
-import {
-  createOrder,
-  prepareClientSubscriptions,
-} from "../../../services/orderService";
-import Toast from "react-native-toast-message";
-import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Colors } from "../../../constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { Dropdown } from "react-native-element-dropdown";
-import { useCart, SubscriptionType } from "../../hooks/useCart";
-import { usePayment } from "../../hooks/usePayment";
-import { Routes } from "../../navigation/Routes";
-import { useTranslate } from "../../utils/translationUtils";
-// Create data for the dropdown
+import { Colors } from "../../../constants/Colors";
+
+// Données statiques pour le panier
+const staticCart = [
+  {
+    id: "1",
+    name: "Produit A",
+    price: 12.99,
+    url: "https://via.placeholder.com/80",
+    type: "monthly",
+  },
+  {
+    id: "2",
+    name: "Produit B",
+    price: 8.5,
+    url: "https://via.placeholder.com/80",
+    type: "annual",
+  },
+];
+
 const subscriptionTypeData = [
   { label: "Mensuel", value: "monthly" },
   { label: "Annuel", value: "annual" },
 ];
-console.log("env variable", process.env.TEST);
+
 export default function CartScreen() {
-  const translate = useTranslate();
-  const navigation = useNavigation();
-  const [token, setToken] = useState<string | null>(null);
-
-  const {
-    cart,
-    subscriptionTypes,
-    loadCartData,
-    updateSubscriptionType,
-    deleteCartItem,
-    calculateTotalAmount,
-    clearCart,
-  } = useCart();
-
-  const { loading, handlePayment } = usePayment();
-
-  // Replace useEffect with useFocusEffect to update cart and token on screen focus
-  useFocusEffect(
-    React.useCallback(() => {
-      // Initialize Stripe Configuration only once if needed
-      initStripe({
-        publishableKey:
-          "pk_test_51Ny7JaHVnu49ZpSn2I9HIRbRQeJqmf4Ttz3EscQuyFBYDdsTFFd7xgleXcIM8ognR3BG4sdV1Mfq7iC3hVpheYG700Ay6HrQsk",
-      });
-      loadCartData();
-      getToken();
-      // Cleanup if necessary
-      return () => {};
-    }, [])
+  // Calcul du total en dur
+  const totalAmount = staticCart.reduce(
+    (sum, item) => sum + item.price * (item.type === "annual" ? 10 : 1),
+    0
   );
-
-  const getToken = async () => {
-    try {
-      const userToken = await AsyncStorage.getItem("token");
-      setToken(userToken);
-    } catch (error) {
-      // Silent error
-    }
-  };
-
-  const totalAmount = calculateTotalAmount();
-
-  const handleCheckout = async () => {
-    if (!token) {
-      Toast.show({
-        type: "error",
-        text1: "Veuillez vous connecter avant de commander",
-      });
-      return;
-    }
-
-    const { success } = await handlePayment(totalAmount, token);
-
-    if (success) {
-      // Create client subscriptions after successful payment
-      await createSubscriptionsAfterPayment();
-
-      Toast.show({
-        type: "success",
-        text1: "Succès",
-        text2: "Paiement effectué avec succès!",
-      });
-
-      // Clear the cart on successful payment
-      await clearCart();
-      // Reload cart data
-      loadCartData();
-    }
-  };
-
-  // Function to create client subscriptions after payment
-  const createSubscriptionsAfterPayment = async () => {
-    if (!token || cart.length === 0) return;
-
-    try {
-      // Prepare subscription data using the orderService
-      const subscriptionsToCreate = prepareClientSubscriptions(
-        cart,
-        subscriptionTypes
-      );
-
-      const success = await createClientSubscription(
-        subscriptionsToCreate,
-        token
-      );
-
-      if (success) {
-        console.log("Client subscriptions created successfully");
-        // After successful subscription creation, create an order record
-        await createOrder(totalAmount, token);
-      } else {
-        console.error("Failed to create client subscriptions");
-        Toast.show({
-          type: "error",
-          text1: "Erreur",
-          text2:
-            "Paiement réussi mais problème lors de l'activation des abonnements",
-        });
-      }
-    } catch (error) {
-      console.error("Error creating subscriptions:", error);
-      Toast.show({
-        type: "error",
-        text1: "Erreur",
-        text2: "Problème lors de l'activation des abonnements",
-      });
-    }
-  };
-
-  if (cart.length === 0) {
-    return (
-      <View style={styles.emptyContainer}>
-        <Ionicons
-          name="cart-outline"
-          size={80}
-          color="#fff"
-          style={styles.emptyIcon}
-        />
-        <Text style={styles.emptyText}>{translate("your_cart_is_empty")}</Text>
-        <TouchableOpacity
-          style={styles.shopButton}
-          onPress={() => navigation.navigate(Routes.ShopTab as never)}
-        >
-          <Text style={styles.shopButtonText}>
-            {translate("continue_shopping")}
-          </Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.productContainer}>
         <Text style={styles.headerTitle}>Mon panier</Text>
-        {cart.map((item) => (
+        {staticCart.map((item) => (
           <View key={item.id} style={styles.productItem}>
             <Image source={{ uri: item.url }} style={styles.productImage} />
             <View style={styles.productDetails}>
@@ -175,10 +54,7 @@ export default function CartScreen() {
               <Text style={styles.productDetail}>
                 Prix:{" "}
                 <Text style={styles.priceValue}>
-                  {(
-                    item.price *
-                    (subscriptionTypes[item.id] === "annual" ? 10 : 1)
-                  ).toFixed(2)}{" "}
+                  {(item.price * (item.type === "annual" ? 10 : 1)).toFixed(2)}{" "}
                   €
                 </Text>
               </Text>
@@ -195,20 +71,13 @@ export default function CartScreen() {
                   labelField="label"
                   valueField="value"
                   placeholder="Choisir"
-                  value={subscriptionTypes[item.id] || "monthly"}
-                  onChange={(selectedItem) => {
-                    updateSubscriptionType(
-                      item.id,
-                      selectedItem.value as SubscriptionType
-                    );
-                  }}
+                  value={item.type}
+                  disable={true}
+                  onChange={() => {}}
                 />
               </View>
             </View>
-            <TouchableOpacity
-              style={styles.deleteButton}
-              onPress={() => deleteCartItem(item.id)}
-            >
+            <TouchableOpacity style={styles.deleteButton} disabled>
               <Ionicons
                 name="trash-outline"
                 size={24}
@@ -223,27 +92,16 @@ export default function CartScreen() {
           <Text style={styles.labelTotal}>Total:</Text>
           <Text style={styles.priceTotal}>{totalAmount.toFixed(2)} €</Text>
         </View>
-        <TouchableOpacity
-          style={styles.commandButton}
-          onPress={handleCheckout}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#fff" size="small" />
-          ) : (
-            <>
-              <Text style={styles.commandButtonText}>Commander</Text>
-              <Ionicons
-                name="arrow-forward"
-                size={20}
-                color="#fff"
-                style={styles.buttonIcon}
-              />
-            </>
-          )}
+        <TouchableOpacity style={styles.commandButton} disabled>
+          <Text style={styles.commandButtonText}>Commander</Text>
+          <Ionicons
+            name="arrow-forward"
+            size={20}
+            color="#fff"
+            style={styles.buttonIcon}
+          />
         </TouchableOpacity>
       </View>
-      <Toast />
     </View>
   );
 }
