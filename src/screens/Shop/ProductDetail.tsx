@@ -12,6 +12,7 @@ import Toast from "react-native-toast-message";
 import { Colors } from "../../../constants/Colors";
 import { Product } from "../../models/Entities";
 import { translateEntity } from "../../utils/translationUtils";
+import { useTranslate } from "../../utils/translationUtils";
 
 type ProductDetailRouteProp = RouteProp<
   { params: { product: Product } },
@@ -21,7 +22,7 @@ type ProductDetailRouteProp = RouteProp<
 export default function ProductDetail() {
   const { params } = useRoute<ProductDetailRouteProp>();
   const product = params.product;
-
+  const translate = useTranslate();
   // Fonction utilitaire pour obtenir le prix à afficher
   const getDisplayPrice = () => {
     if (product.monthly_price != null) return product.monthly_price;
@@ -47,7 +48,7 @@ export default function ProductDetail() {
         <Text style={styles.description}>{translatedDescription}</Text>
         <View style={styles.buttonContainer}>
           <Button
-            title="Ajouter au panier"
+            title={translate("add_to_cart")}
             onPress={() => {
               console.log("add to cart");
             }}

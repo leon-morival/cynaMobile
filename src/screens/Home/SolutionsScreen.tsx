@@ -235,6 +235,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255, 255, 255, 0.1)",
     padding: 20,
     borderRadius: 15,
+    marginBottom: 40,
   },
   description: {
     fontSize: 16,
@@ -270,6 +271,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     marginTop: 10,
+    marginBottom: 5,
   },
   contactButtonText: {
     color: "white",

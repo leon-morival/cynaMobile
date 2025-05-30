@@ -57,18 +57,6 @@ export function useTranslate() {
   return translate;
 }
 
-// Fonction utilitaire pure (sans hooks)
-function translate(
-  key: string,
-  translations: Record<string, Record<string, string>> | null | undefined,
-  language: string
-): string {
-  if (!translations) {
-    return "";
-  }
-  return translations[key]?.[language] || "";
-}
-
 export function translateEntity(
   translations: any[],
 

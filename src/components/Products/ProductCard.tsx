@@ -13,14 +13,14 @@ import { Colors } from "../../../constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { Routes } from "../../navigation/Routes";
 import { translateEntity } from "../../utils/translationUtils";
-
+import { useTranslate } from "../../utils/translationUtils";
 interface ProductCardProps {
   offer: Product;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ offer }) => {
   const navigation = useNavigation<any>();
-
+  const translate = useTranslate();
   // Fonction utilitaire pour obtenir le prix à afficher
   const getDisplayPrice = () => {
     if (offer.monthly_price != null) return offer.monthly_price;
@@ -70,7 +70,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ offer }) => {
               style={styles.detailsButton}
               onPress={handlePress}
             >
-              <Text style={styles.detailsButtonText}>Détails</Text>
+              <Text style={styles.detailsButtonText}>
+                {translate("details")}
+              </Text>
               <Ionicons name="chevron-forward" size={14} color="#fff" />
             </TouchableOpacity>
           </View>
