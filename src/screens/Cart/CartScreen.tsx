@@ -11,6 +11,9 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { Dropdown } from "react-native-element-dropdown";
 import { Colors } from "../../../constants/Colors";
+import { useTranslate } from "../../utils/translationUtils";
+import { API_URL } from "../../../constants/api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Données statiques pour le panier
 const staticCart = [
@@ -36,56 +39,190 @@ const subscriptionTypeData = [
 ];
 
 export default function CartScreen() {
-  // Calcul du total en dur
-  const totalAmount = staticCart.reduce(
-    (sum, item) => sum + item.price * (item.type === "annual" ? 10 : 1),
-    0
-  );
+  const [cart, setCart] = React.useState<any>(null);
+  const [loading, setLoading] = React.useState(true);
+  const translate = useTranslate();
+
+  React.useEffect(() => {
+    const fetchCart = async () => {
+      setLoading(true);
+      try {
+        const token = await AsyncStorage.getItem("token");
+        if (!token) {
+          setCart(null);
+          setLoading(false);
+          return;
+        }
+        const response = await fetch(`${API_URL}/cart`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!response.ok) {
+          setCart(null);
+        } else {
+          const data = await response.json();
+          setCart(data);
+        }
+      } catch (e) {
+        setCart(null);
+      }
+      setLoading(false);
+    };
+    fetchCart();
+  }, []);
+
+  // Fonction pour supprimer un item du panier
+  const handleDelete = async (orderItemId: number) => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      if (!token) return;
+      const response = await fetch(`${API_URL}/remove-from-cart`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ order_item_id: orderItemId }),
+      });
+      if (response.ok) {
+        // Refresh cart
+        const data = await response.json();
+        setCart(data);
+      }
+    } catch (e) {}
+  };
+
+  // Fonction pour modifier le type d'abonnement d'un item
+  const handleTypeChange = async (orderItemId: number, newType: string) => {
+    console.log("[Cart] handleTypeChange called", { orderItemId, newType });
+    try {
+      const token = await AsyncStorage.getItem("token");
+      console.log("[Cart] token:", token);
+      if (!token) return;
+      const response = await fetch(`${API_URL}/update-cart-item`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          order_item_id: orderItemId,
+          quantity: 1,
+          subscription_type: newType,
+        }),
+      });
+      console.log("[Cart] response status:", response.status);
+      if (response.ok) {
+        const data = await response.json();
+        console.log("[Cart] type changed successfully, new cart:", data);
+        setCart(data);
+      } else {
+        const error = await response.text();
+        // console.log("[Cart] error response:", error);
+      }
+    } catch (e) {
+      console.log("[Cart] handleTypeChange error:", e);
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color={Colors.secondary} />
+      </View>
+    );
+  }
+
+  if (!cart || !cart.items || cart.items.length === 0) {
+    return (
+      <View style={styles.emptyContainer}>
+        <Ionicons
+          name="cart-outline"
+          size={60}
+          color="#fff"
+          style={styles.emptyIcon}
+        />
+        <Text style={styles.emptyText}>{translate("cart_empty")}</Text>
+      </View>
+    );
+  }
+
+  const totalAmount = cart.ttc_price ?? 0;
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.productContainer}>
-        <Text style={styles.headerTitle}>Mon panier</Text>
-        {staticCart.map((item) => (
-          <View key={item.id} style={styles.productItem}>
-            <Image source={{ uri: item.url }} style={styles.productImage} />
-            <View style={styles.productDetails}>
-              <Text style={styles.productName}>{item.name}</Text>
-              <Text style={styles.productDetail}>
-                Prix:{" "}
-                <Text style={styles.priceValue}>
-                  {(item.price * (item.type === "annual" ? 10 : 1)).toFixed(2)}{" "}
-                  €
-                </Text>
-              </Text>
-              <View style={styles.subscriptionTypeContainer}>
-                <Text style={styles.productDetail}>Type: </Text>
-                <Dropdown
-                  style={styles.dropdown}
-                  placeholderStyle={styles.placeholderStyle}
-                  selectedTextStyle={styles.selectedTextStyle}
-                  itemContainerStyle={styles.dropdownItemContainer}
-                  itemTextStyle={styles.dropdownItemText}
-                  data={subscriptionTypeData}
-                  maxHeight={300}
-                  labelField="label"
-                  valueField="value"
-                  placeholder="Choisir"
-                  value={item.type}
-                  disable={true}
-                  onChange={() => {}}
-                />
-              </View>
-            </View>
-            <TouchableOpacity style={styles.deleteButton} disabled>
-              <Ionicons
-                name="trash-outline"
-                size={24}
-                color={Colors.secondary}
+        <Text style={styles.headerTitle}>{translate("cart")}</Text>
+        {cart.items.map((item: any) => {
+          const translated =
+            item.product.translations?.find((t: any) => t.lang === "fr") ||
+            item.product.translations?.[0] ||
+            {};
+          // Détermine les types d'abonnement disponibles pour ce produit
+          const typeOptions = [
+            item.product.monthly_price != null && {
+              label: translate("mensual"),
+              value: "mensual",
+            },
+            item.product.annual_price != null && {
+              label: translate("annual"),
+              value: "annual",
+            },
+            item.product.lifetime_price != null && {
+              label: translate("lifetime"),
+              value: "lifetime",
+            },
+          ].filter(Boolean);
+          return (
+            <View key={item.id} style={styles.productItem}>
+              <Image
+                source={{ uri: item.product.image }}
+                style={styles.productImage}
               />
-            </TouchableOpacity>
-          </View>
-        ))}
+              <View style={styles.productDetails}>
+                <Text style={styles.productName}>
+                  {translated.name || "Produit"}
+                </Text>
+                <Text style={styles.productDetail}>
+                  Prix:{" "}
+                  <Text style={styles.priceValue}>
+                    {item.ttc_price?.toFixed(2)} €
+                  </Text>
+                </Text>
+                <View style={styles.subscriptionTypeContainer}>
+                  <Text style={styles.productDetail}>Type: </Text>
+                  <Dropdown
+                    style={styles.dropdown}
+                    placeholderStyle={styles.placeholderStyle}
+                    selectedTextStyle={styles.selectedTextStyle}
+                    itemContainerStyle={styles.dropdownItemContainer}
+                    itemTextStyle={styles.dropdownItemText}
+                    data={typeOptions as any}
+                    maxHeight={300}
+                    labelField="label"
+                    valueField="value"
+                    placeholder="Choisir"
+                    value={item.subscription_type}
+                    disable={typeOptions.length <= 1}
+                    onChange={(val: any) =>
+                      handleTypeChange(item.id, val.value)
+                    }
+                  />
+                </View>
+              </View>
+              <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={() => handleDelete(item.id)}
+              >
+                <Ionicons
+                  name="trash-outline"
+                  size={24}
+                  color={Colors.secondary}
+                />
+              </TouchableOpacity>
+            </View>
+          );
+        })}
       </ScrollView>
       <View style={styles.bottomBar}>
         <View style={styles.totalRow}>
@@ -93,7 +230,9 @@ export default function CartScreen() {
           <Text style={styles.priceTotal}>{totalAmount.toFixed(2)} €</Text>
         </View>
         <TouchableOpacity style={styles.commandButton} disabled>
-          <Text style={styles.commandButtonText}>Commander</Text>
+          <Text style={styles.commandButtonText}>
+            {translate("place_order")}
+          </Text>
           <Ionicons
             name="arrow-forward"
             size={20}

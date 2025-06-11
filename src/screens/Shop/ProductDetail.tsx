@@ -13,6 +13,9 @@ import { Colors } from "../../../constants/Colors";
 import { Product } from "../../models/Entities";
 import { translateEntity } from "../../utils/translationUtils";
 import { useTranslate } from "../../utils/translationUtils";
+import { Picker } from "@react-native-picker/picker";
+import { API_URL } from "../../../constants/api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type ProductDetailRouteProp = RouteProp<
   { params: { product: Product } },
@@ -23,35 +26,112 @@ export default function ProductDetail() {
   const { params } = useRoute<ProductDetailRouteProp>();
   const product = params.product;
   const translate = useTranslate();
-  // Fonction utilitaire pour obtenir le prix à afficher
-  const getDisplayPrice = () => {
-    if (product.monthly_price != null) return product.monthly_price;
-    if (product.annual_price != null) return product.annual_price;
-    if (product.lifetime_price != null) return product.lifetime_price;
-    return null;
-  };
-  const displayPrice = getDisplayPrice();
+  const [selectedType, setSelectedType] = React.useState<string>(() => {
+    if (product.monthly_price != null) return "mensual";
+    if (product.annual_price != null) return "annual";
+    if (product.lifetime_price != null) return "lifetime";
+    return "";
+  });
+
+  // Liste des options disponibles (filtrage typé)
+  type PriceOption = { label: string; value: string; price: number };
+  const priceOptions: PriceOption[] = [
+    product.monthly_price != null
+      ? {
+          label: translate("mensual"),
+          value: "mensual",
+          price: product.monthly_price,
+        }
+      : undefined,
+    product.annual_price != null
+      ? {
+          label: translate("annual"),
+          value: "annual",
+          price: product.annual_price,
+        }
+      : undefined,
+    product.lifetime_price != null
+      ? {
+          label: translate("lifetime"),
+          value: "lifetime",
+          price: product.lifetime_price,
+        }
+      : undefined,
+  ].filter((opt): opt is PriceOption => !!opt);
+
+  // Prix affiché selon la sélection
+  const displayPrice =
+    priceOptions.find((opt) => opt.value === selectedType)?.price ?? null;
 
   // Utilise translateEntity pour la traduction selon la langue courante
   const translatedProduct = translateEntity(product.translations, product);
   const translatedName = translatedProduct.name || "";
   const translatedDescription = translatedProduct.description || "";
 
+  const addToCart = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      if (!token) {
+        Toast.show({ type: "error", text1: translate("not_logged_in") });
+        return;
+      }
+      const response = await fetch(`${API_URL}/add-to-cart`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          product_id: product.id,
+          quantity: 1, // tu peux ajouter un sélecteur de quantité si besoin
+          subscription_type: selectedType,
+        }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        Toast.show({
+          type: "error",
+          text1: translate("add_to_cart_error"),
+          text2: errorData.message || "",
+        });
+        return;
+      }
+      Toast.show({ type: "success", text1: translate("add_to_cart_success") });
+    } catch (e) {
+      Toast.show({ type: "error", text1: translate("add_to_cart_error") });
+    }
+  };
   return (
     <ScrollView style={styles.container}>
       <Image source={{ uri: product.image }} style={styles.image} />
       <View style={styles.content}>
         <Text style={styles.name}>{translatedName}</Text>
-        {displayPrice !== null && (
+        {priceOptions.length > 1 && (
+          <Picker
+            selectedValue={selectedType}
+            onValueChange={setSelectedType}
+            style={{ marginBottom: 10 }}
+          >
+            {priceOptions.map((opt) => (
+              <Picker.Item
+                key={opt.value}
+                label={opt.label + " - " + opt.price + "€"}
+                value={opt.value}
+              />
+            ))}
+          </Picker>
+        )}
+        {displayPrice !== null && priceOptions.length === 1 && (
+          <Text style={styles.price}>{displayPrice}€</Text>
+        )}
+        {displayPrice !== null && priceOptions.length > 1 && (
           <Text style={styles.price}>{displayPrice}€</Text>
         )}
         <Text style={styles.description}>{translatedDescription}</Text>
         <View style={styles.buttonContainer}>
           <Button
             title={translate("add_to_cart")}
-            onPress={() => {
-              console.log("add to cart");
-            }}
+            onPress={addToCart}
             color={Colors.primary}
           />
         </View>
