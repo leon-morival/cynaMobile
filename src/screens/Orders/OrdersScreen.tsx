@@ -1,59 +1,33 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   ScrollView,
   Text,
   View,
   StyleSheet,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
-import { ClientSubscription, BillingMethod } from "../../models/Entities";
+import { AuthContext } from "../../context/AuthContext";
+import { getUserSubscriptions } from "../../../services/subscriptionService";
+import { useTranslate } from "../../utils/translationUtils";
 
 export default function OrdersScreen() {
-  // Mock client subscriptions data
-  const clientSubscriptions: ClientSubscription[] = [
-    {
-      id: 1,
-      billing_method: BillingMethod.ANNUAL,
-      started_at: "2023-04-15T10:30:00Z",
-      end_at: "2024-04-15T10:30:00Z",
-      price: 99.99,
-      is_active: true,
-      is_renewable: true,
-      user_id: 2,
-      subscription_offer_id: 1,
-      created_at: "2023-04-15T10:30:00Z",
-      updated_at: "2023-04-15T10:30:00Z",
-    },
-    {
-      id: 2,
-      billing_method: BillingMethod.MENSUAL,
-      started_at: "2023-05-20T14:45:00Z",
-      end_at: "2023-06-20T14:45:00Z",
-      price: 9.99,
-      is_active: false,
-      is_renewable: false,
-      user_id: 2,
-      subscription_offer_id: 2,
-      created_at: "2023-05-20T14:45:00Z",
-      updated_at: "2023-05-20T14:45:00Z",
-    },
-    {
-      id: 3,
-      billing_method: BillingMethod.LIFETIME,
-      started_at: "2023-06-10T09:15:00Z",
-      end_at: "2099-12-31T23:59:59Z",
-      price: 299.99,
-      is_active: true,
-      is_renewable: false,
-      user_id: 2,
-      subscription_offer_id: 3,
-      created_at: "2023-06-10T09:15:00Z",
-      updated_at: "2023-06-10T09:15:00Z",
-    },
-  ];
+  const { token } = useContext(AuthContext);
+  const [subscriptions, setSubscriptions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const translate = useTranslate();
 
-  // Format date for better display
+  useEffect(() => {
+    if (!token) return;
+    setLoading(true);
+    getUserSubscriptions(token)
+      .then((subs) => setSubscriptions(subs))
+      .catch(() => setSubscriptions([]))
+      .finally(() => setLoading(false));
+  }, [token]);
+
   const formatDate = (dateString: string) => {
+    if (!dateString) return "-";
     const date = new Date(dateString);
     return date.toLocaleDateString("fr-FR", {
       day: "2-digit",
@@ -62,46 +36,56 @@ export default function OrdersScreen() {
     });
   };
 
-  // Translate billing method to French
-  const getBillingMethodLabel = (method: BillingMethod) => {
-    switch (method) {
-      case BillingMethod.ANNUAL:
-        return "Annuel";
-      case BillingMethod.MENSUAL:
-        return "Mensuel";
-      case BillingMethod.LIFETIME:
-        return "À vie";
+  const getBillingMethodLabel = (type: string) => {
+    switch (type) {
+      case "annual":
+        return translate("billing_annual");
+      case "mensual":
+        return translate("billing_monthly");
+      case "lifetime":
+        return translate("billing_lifetime");
       default:
-        return method;
+        return type;
     }
   };
 
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#0066cc" />
+      </View>
+    );
+  }
+
   return (
     <ScrollView style={styles.container}>
-      {clientSubscriptions.length === 0 ? (
-        <Text style={styles.emptyText}>
-          Vous n'avez pas encore d'abonnements
-        </Text>
+      {subscriptions.length === 0 ? (
+        <Text style={styles.emptyText}>{translate("no_subscriptions")}</Text>
       ) : (
-        clientSubscriptions.map((subscription) => (
+        subscriptions.map((subscription) => (
           <TouchableOpacity
             key={subscription.id}
             style={styles.subscriptionCard}
           >
             <View style={styles.headerRow}>
               <Text style={styles.subscriptionId}>
-                Abonnement #{subscription.id}
+                {translate("subscription_number").replace(
+                  "{{id}}",
+                  subscription.id
+                )}
               </Text>
               <View
                 style={[
                   styles.statusIndicator,
-                  subscription.is_active
+                  subscription.status === "active"
                     ? styles.activeStatus
                     : styles.inactiveStatus,
                 ]}
               >
                 <Text style={styles.statusText}>
-                  {subscription.is_active ? "Actif" : "Inactif"}
+                  {subscription.status === "active"
+                    ? translate("subscription_active")
+                    : translate("subscription_inactive")}
                 </Text>
               </View>
             </View>
@@ -110,45 +94,48 @@ export default function OrdersScreen() {
 
             <View style={styles.detailsContainer}>
               <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Type de facturation:</Text>
+                <Text style={styles.detailLabel}>
+                  {translate("billing_type_label")}
+                </Text>
                 <Text style={styles.detailValue}>
-                  {getBillingMethodLabel(subscription.billing_method)}
+                  {getBillingMethodLabel(subscription.subscription_type)}
                 </Text>
               </View>
 
               <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Date de début:</Text>
+                <Text style={styles.detailLabel}>
+                  {translate("start_date_label")}
+                </Text>
                 <Text style={styles.detailValue}>
-                  {formatDate(subscription.started_at)}
+                  {formatDate(subscription.start_date)}
                 </Text>
               </View>
 
               <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Date de fin:</Text>
+                <Text style={styles.detailLabel}>
+                  {translate("end_date_label")}
+                </Text>
                 <Text style={styles.detailValue}>
-                  {subscription.billing_method === BillingMethod.LIFETIME
-                    ? "Sans limite"
-                    : formatDate(subscription.end_at)}
+                  {subscription.subscription_type === "lifetime"
+                    ? translate("no_limit")
+                    : formatDate(subscription.end_date)}
                 </Text>
               </View>
 
               <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Prix:</Text>
-                <Text style={styles.priceValue}>
-                  {subscription.price.toFixed(2)} €
+                <Text style={styles.detailLabel}>
+                  {translate("license_label")}
                 </Text>
-              </View>
-
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Renouvelable:</Text>
                 <Text style={styles.detailValue}>
-                  {subscription.is_renewable ? "Oui" : "Non"}
+                  {subscription.licence_key || "-"}
                 </Text>
               </View>
             </View>
 
             <View style={styles.footer}>
-              <Text style={styles.viewDetailsText}>Voir les détails</Text>
+              <Text style={styles.viewDetailsText}>
+                {translate("see_invoices")}
+              </Text>
             </View>
           </TouchableOpacity>
         ))

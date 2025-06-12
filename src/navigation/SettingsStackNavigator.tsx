@@ -30,7 +30,7 @@ export default function SettingsStackNavigator() {
       <Stack.Screen
         name={Routes.OrdersScreen}
         component={OrdersScreen}
-        options={{ headerShown: true, title: "Mes commandes" }}
+        options={{ headerShown: true, title: translate("orders_title") }}
       />
     </Stack.Navigator>
   );

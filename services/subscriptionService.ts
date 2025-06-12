@@ -1,7 +1,5 @@
-import { SubscriptionOffer, BillingMethod } from "../src/models/Entities";
 import { API_URL } from "../constants/api";
 interface CreateSubscriptionRequest {
-  billing_method: BillingMethod;
   subscription_offer_id: number;
   price: number;
 }
@@ -33,4 +31,26 @@ export async function createClientSubscription(
     console.error("Error creating client subscription:", error);
     return false;
   }
+}
+
+export async function getUserSubscriptions(token: string) {
+  const res = await fetch(`${API_URL}/subscriptions`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Failed to fetch subscriptions");
+  return await res.json();
+}
+
+export async function getSubscriptionInvoices(
+  subscriptionId: number,
+  token: string
+) {
+  const res = await fetch(
+    `${API_URL}/subscriptions/${subscriptionId}/invoices`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  if (!res.ok) throw new Error("Failed to fetch invoices");
+  return await res.json();
 }

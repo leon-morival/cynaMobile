@@ -8,10 +8,12 @@ import {
 } from "react-native";
 import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 
 import Login from "../../components/Auth/Login";
 import Register from "../../components/Auth/Register";
 import Profile from "../../components/Settings/Profile";
+import { Routes } from "../../navigation/Routes";
 
 import { Colors } from "../../../constants/Colors";
 import { API_URL } from "../../../constants/api";
@@ -26,6 +28,7 @@ const SettingsScreen = () => {
   const [selectedForm, setSelectedForm] = useState<"login" | "register">(
     "login"
   );
+  const navigation = useNavigation();
 
   const loginHandler = async (email: string, password: string) => {
     try {
@@ -259,6 +262,19 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     marginVertical: 10,
+  },
+  menuButton: {
+    marginTop: 20,
+    alignSelf: "center",
+    backgroundColor: Colors.primary,
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    borderRadius: 10,
+  },
+  menuButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });
 
