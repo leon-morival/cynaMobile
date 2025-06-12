@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_URL } from "../../../constants/api";
+import apiClient from "../../apiClient";
 
 export function useCart() {
   const [cart, setCart] = useState<any>(null);
@@ -15,15 +16,10 @@ export function useCart() {
         setLoading(false);
         return;
       }
-      const response = await fetch(`${API_URL}/cart`, {
+      const response = await apiClient.get("/cart", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!response.ok) {
-        setCart(null);
-      } else {
-        const data = await response.json();
-        setCart(data);
-      }
+      setCart(response.data);
     } catch (e) {
       setCart(null);
     }
@@ -39,17 +35,14 @@ export function useCart() {
       try {
         const token = await AsyncStorage.getItem("token");
         if (!token) return;
-        const response = await fetch(`${API_URL}/remove-from-cart`, {
-          method: "DELETE",
+        await apiClient.delete("/remove-from-cart", {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ order_item_id: orderItemId }),
+          data: { order_item_id: orderItemId },
         });
-        if (response.ok) {
-          fetchCart();
-        }
+        fetchCart();
       } catch (e) {}
     },
     [fetchCart]
@@ -60,22 +53,22 @@ export function useCart() {
       try {
         const token = await AsyncStorage.getItem("token");
         if (!token) return;
-        const response = await fetch(`${API_URL}/update-cart-item`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
+        await apiClient.put(
+          "/update-cart-item",
+          {
             order_item_id: orderItemId,
             quantity: 1,
             subscription_type: newType,
-          }),
-        });
-        if (response.ok) {
-          fetchCart();
-        }
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        fetchCart();
       } catch (e) {}
     },
     [fetchCart]

@@ -14,6 +14,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContext } from "../../context/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../../../constants/Colors";
+import apiClient from "../../apiClient";
 
 import { API_URL } from "../../../constants/api";
 import { useTranslate } from "../../utils/translationUtils";
@@ -52,16 +53,12 @@ const Register = () => {
         body.siret = registerSiret;
       }
 
-      const test = await fetch(`${API_URL}/users`);
-      const testData = await test.json();
-      console.log("Test fetch users:", testData);
-      const response = await fetch(`${API_URL}/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      const data = await response.json();
-      if (!response.ok || data.errors) {
+      // Optionnel : test d'appel users (à supprimer si inutile)
+      await apiClient.get("/users");
+
+      const response = await apiClient.post("/register", body);
+      const data = response.data;
+      if (data.errors) {
         const errorMsg =
           data.errors?.email && Array.isArray(data.errors.email)
             ? data.errors.email[0]
@@ -78,45 +75,29 @@ const Register = () => {
         setToken(data.token);
 
         try {
-          const userResponse = await fetch(`${API_URL}/user`, {
-            method: "GET",
+          const userResponse = await apiClient.get("/user", {
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${data.token}`,
             },
           });
 
-          if (userResponse.ok) {
-            const userData = await userResponse.json();
-
-            setUser(userData);
-            await AsyncStorage.setItem("user", JSON.stringify(userData));
-          } else {
-            // Fallback to the limited user data if the profile fetch fails
-            setUser(data.user);
-            await AsyncStorage.setItem("user", JSON.stringify(data.user));
-          }
+          setUser(userResponse.data);
+          await AsyncStorage.setItem("user", JSON.stringify(userResponse.data));
         } catch (profileError) {
-          console.error("Error fetching complete profile:", profileError);
-          // Still use the basic user data we have
-          if (data.user) {
-            setUser(data.user);
-            await AsyncStorage.setItem("user", JSON.stringify(data.user));
-          }
+          setUser(data.user);
+          await AsyncStorage.setItem("user", JSON.stringify(data.user));
         }
       }
-
       Toast.show({
         type: "success",
-        text1: "Register",
-        text2: "Inscription réussie",
+        text1: "Inscription réussie",
       });
-    } catch (error) {
-      console.log("Error during registration:", error);
+    } catch (error: any) {
       Toast.show({
         type: "error",
         text1: "Erreur",
-        text2: "Erreur lors de l'inscription",
+        text2: error?.response?.data?.message || "Erreur lors de l'inscription",
       });
     }
   };

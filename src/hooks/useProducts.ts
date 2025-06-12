@@ -3,6 +3,7 @@ import { Category, Product } from "../models/Entities";
 import { API_URL } from "../../constants/api";
 import { useLanguage } from "../context/LanguageContext";
 import { translateEntity } from "../utils/translationUtils";
+import apiClient from "../apiClient";
 
 export const useProducts = () => {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -16,17 +17,11 @@ export const useProducts = () => {
     setError(null);
     try {
       // Fetch categories
-      const catResponse = await fetch(`${API_URL}/categories`);
-      if (!catResponse.ok) {
-        throw new Error(`Error fetching categories: ${catResponse.status}`);
-      }
-      const catData: Category[] = await catResponse.json();
+      const catResponse = await apiClient.get<Category[]>("/categories");
+      const catData: Category[] = catResponse.data;
 
-      const offerResponse = await fetch(`${API_URL}/products`);
-      if (!offerResponse.ok) {
-        throw new Error(`Error fetching products: ${offerResponse.status}`);
-      }
-      const productsData: Product[] = await offerResponse.json();
+      const offerResponse = await apiClient.get<Product[]>("/products");
+      const productsData: Product[] = offerResponse.data;
 
       setCategories(catData || []);
       setProducts(productsData || []);

@@ -9,10 +9,10 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Colors } from "../../../constants/Colors";
-import { API_URL } from "../../../constants/api";
 import { AuthContext } from "../../context/AuthContext";
 import Toast from "react-native-toast-message";
 import { useTranslate } from "../../utils/translationUtils";
+import apiClient from "../../apiClient";
 
 export default function PasswordChange() {
   const { token } = useContext(AuthContext);
@@ -25,7 +25,6 @@ export default function PasswordChange() {
 
   const handleChangePassword = async () => {
     try {
-      // Reset errors
       setErrors({});
 
       // Client-side validation
@@ -73,36 +72,26 @@ export default function PasswordChange() {
         return;
       }
 
-      // Call API using fetch
-      const response = await fetch(`${API_URL}/change-password`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/ld+json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
+      // Call API using axios
+      const response = await apiClient.post(
+        "/change-password",
+        {
           current_password: currentPassword,
           password: newPassword,
           password_confirmation: confirmPassword,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || data.errors) {
-        if (response.status === 422) {
-          // Validation errors from server
-          setErrors(data.errors || {});
-        } else {
-          const errorMsg =
-            data.message ||
-            "Une erreur est survenue lors de la modification du mot de passe";
-          Toast.show({
-            type: "error",
-            text1: "Erreur",
-            text2: errorMsg,
-          });
+        },
+        {
+          headers: {
+            "Content-Type": "application/ld+json",
+            Authorization: `Bearer ${token}`,
+          },
         }
+      );
+
+      const data = response.data;
+
+      if (data.errors) {
+        setErrors(data.errors || {});
         setIsLoading(false);
         return;
       }
@@ -110,20 +99,24 @@ export default function PasswordChange() {
       // Success
       Toast.show({
         type: "success",
-        text1: "Succès",
-        text2: data.message || "Votre mot de passe a été modifié avec succès",
+        text1: translate("password_change_success"),
       });
 
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-    } catch (error) {
-      Toast.show({
-        type: "error",
-        text1: "Erreur",
-        text2: error.message || "Une erreur est survenue",
-      });
-    } finally {
+    } catch (error: any) {
+      if (error?.response?.status === 422) {
+        setErrors(error.response.data.errors || {});
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "Erreur",
+          text2:
+            error?.response?.data?.message ||
+            "Une erreur est survenue lors de la modification du mot de passe",
+        });
+      }
       setIsLoading(false);
     }
   };

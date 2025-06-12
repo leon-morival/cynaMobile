@@ -16,6 +16,7 @@ import { useTranslate } from "../../utils/translationUtils";
 import { Picker } from "@react-native-picker/picker";
 import { API_URL } from "../../../constants/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import apiClient from "../../apiClient";
 
 type ProductDetailRouteProp = RouteProp<
   { params: { product: Product } },
@@ -75,30 +76,28 @@ export default function ProductDetail() {
         Toast.show({ type: "error", text1: translate("not_logged_in") });
         return;
       }
-      const response = await fetch(`${API_URL}/add-to-cart`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
+      await apiClient.post(
+        "/add-to-cart",
+        {
           product_id: product.id,
           quantity: 1, // tu peux ajouter un sélecteur de quantité si besoin
           subscription_type: selectedType,
-        }),
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        Toast.show({
-          type: "error",
-          text1: translate("add_to_cart_error"),
-          text2: errorData.message || "",
-        });
-        return;
-      }
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       Toast.show({ type: "success", text1: translate("add_to_cart_success") });
-    } catch (e) {
-      Toast.show({ type: "error", text1: translate("add_to_cart_error") });
+    } catch (e: any) {
+      const errorMsg = e?.response?.data?.message || "";
+      Toast.show({
+        type: "error",
+        text1: translate("add_to_cart_error"),
+        text2: errorMsg,
+      });
     }
   };
   return (

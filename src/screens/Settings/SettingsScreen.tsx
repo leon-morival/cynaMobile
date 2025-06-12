@@ -20,6 +20,7 @@ import { API_URL } from "../../../constants/api";
 import { AuthContext } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { useTranslate } from "../../utils/translationUtils";
+import apiClient from "../../apiClient";
 
 const SettingsScreen = () => {
   const translate = useTranslate();
@@ -32,13 +33,13 @@ const SettingsScreen = () => {
 
   const loginHandler = async (email: string, password: string) => {
     try {
-      const response = await fetch(`${API_URL}/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/ld+json" },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await response.json();
-      if (!response.ok || data.errors) {
+      const response = await apiClient.post(
+        "/login",
+        { email, password },
+        { headers: { "Content-Type": "application/ld+json" } }
+      );
+      const data = response.data;
+      if (data.errors) {
         const errorMsg =
           data.errors?.email && Array.isArray(data.errors.email)
             ? data.errors.email[0]
@@ -60,11 +61,11 @@ const SettingsScreen = () => {
         text1: "Login",
         text2: "Connexion réussie",
       });
-    } catch (error) {
+    } catch (error: any) {
       Toast.show({
         type: "error",
         text1: "Erreur",
-        text2: "Erreur de connexion",
+        text2: error?.response?.data?.message || "Erreur de connexion",
       });
     }
   };
