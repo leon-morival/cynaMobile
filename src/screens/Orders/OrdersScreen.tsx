@@ -10,12 +10,15 @@ import {
 import { AuthContext } from "../../context/AuthContext";
 import { getUserSubscriptions } from "../../../services/subscriptionService";
 import { useTranslate } from "../../utils/translationUtils";
+import { useNavigation } from "@react-navigation/native";
+import { Routes } from "../../navigation/Routes";
 
 export default function OrdersScreen() {
   const { token } = useContext(AuthContext);
   const [subscriptions, setSubscriptions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const translate = useTranslate();
+  const navigation = useNavigation<any>();
 
   useEffect(() => {
     if (!token) return;
@@ -66,6 +69,11 @@ export default function OrdersScreen() {
           <TouchableOpacity
             key={subscription.id}
             style={styles.subscriptionCard}
+            onPress={() =>
+              navigation.navigate(Routes.InvoiceScreen, {
+                subscriptionId: subscription.id,
+              })
+            }
           >
             <View style={styles.headerRow}>
               <Text style={styles.subscriptionId}>

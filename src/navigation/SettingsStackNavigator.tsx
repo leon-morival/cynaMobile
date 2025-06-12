@@ -4,6 +4,7 @@ import PasswordChange from "../screens/Settings/PasswordChange";
 import SettingsScreen from "../screens/Settings/SettingsScreen";
 import ConditionsScreen from "../screens/Settings/ConditionsScreen";
 import OrdersScreen from "../screens/Orders/OrdersScreen";
+import InvoiceScreen from "../screens/Orders/InvoiceScreen";
 import { Routes } from "./Routes";
 import { useTranslate } from "../utils/translationUtils";
 const Stack = createNativeStackNavigator();
@@ -31,6 +32,14 @@ export default function SettingsStackNavigator() {
         name={Routes.OrdersScreen}
         component={OrdersScreen}
         options={{ headerShown: true, title: translate("orders_title") }}
+      />
+      <Stack.Screen
+        name={Routes.InvoiceScreen}
+        component={InvoiceScreen}
+        options={{
+          headerShown: true,
+          title: translate("invoices_for_subscription"),
+        }}
       />
     </Stack.Navigator>
   );
