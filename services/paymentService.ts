@@ -1,37 +1,47 @@
 import { API_URL } from "../constants/api";
-interface PaymentIntentResponse {
-  clientSecret: string;
-}
 
-export async function createPaymentIntent(
-  amount: number,
-  token: string
-): Promise<PaymentIntentResponse> {
+export async function startStripeCheckout(token: string): Promise<string> {
   try {
-    const response = await fetch(`${API_URL}/create-payment-intent`, {
+    const response = await fetch(`${API_URL}/stripe/checkout`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/ld+json",
-        Authorization: `Bearer ${token}`, // updated to use dynamic token
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({
-        amount: amount * 100,
-        currency: "eur",
-      }),
     });
-
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`HTTP ${response.status}: ${errorText}`);
     }
-
     const data = await response.json();
-    console.log("Raw response data:", data); // added log
-
-    // Map the secret from data if returned as "client_secret"
-    return { clientSecret: data.client_secret || data.clientSecret };
+    if (!data.url) throw new Error("Stripe checkout URL not found");
+    return data.url;
   } catch (error) {
-    console.error("Error creating payment intent:", error);
+    console.error("Error starting Stripe checkout:", error);
+    throw error;
+  }
+}
+
+export async function getStripePaymentIntent(token: string): Promise<string> {
+  try {
+    const response = await fetch(`${API_URL}/stripe/payment-intent`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
+    }
+    const data = await response.json();
+    if (!data.clientSecret) throw new Error("Stripe clientSecret not found");
+    return data.clientSecret;
+  } catch (error) {
+    console.error("Error getting Stripe PaymentIntent:", error);
     throw error;
   }
 }
