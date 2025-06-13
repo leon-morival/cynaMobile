@@ -1,20 +1,19 @@
+import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
-  TextInput,
   ActivityIndicator,
   RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
+import { Colors } from "../../../constants/Colors";
 import CategoryCard from "../../components/Categories/CategoryCard";
 import ProductCard from "../../components/Products/ProductCard";
-import { Colors } from "../../../constants/Colors";
-import { Ionicons } from "@expo/vector-icons";
-import { useProducts } from "../../hooks/useProducts";
-import { API_URL } from "../../../constants/api";
 import { useLanguage } from "../../context/LanguageContext";
+import { useProducts } from "../../hooks/useProducts";
 import { useTranslate } from "../../utils/translationUtils";
 
 export default function ShoppingScreen() {

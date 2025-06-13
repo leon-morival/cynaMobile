@@ -1,26 +1,24 @@
-import React, { useContext, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ActivityIndicator,
-} from "react-native";
-import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
+import React, { useContext, useState } from "react";
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import Toast from "react-native-toast-message";
 
 import Login from "../../components/Auth/Login";
 import Register from "../../components/Auth/Register";
 import Profile from "../../components/Settings/Profile";
-import { Routes } from "../../navigation/Routes";
 
 import { Colors } from "../../../constants/Colors";
-import { API_URL } from "../../../constants/api";
+import apiClient from "../../apiClient";
 import { AuthContext } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { useTranslate } from "../../utils/translationUtils";
-import apiClient from "../../apiClient";
 
 const SettingsScreen = () => {
   const translate = useTranslate();

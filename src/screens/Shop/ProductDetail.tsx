@@ -1,3 +1,5 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Picker } from "@react-native-picker/picker";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import React from "react";
 import {
@@ -10,13 +12,9 @@ import {
 } from "react-native";
 import Toast from "react-native-toast-message";
 import { Colors } from "../../../constants/Colors";
-import { Product } from "../../models/Entities";
-import { translateEntity } from "../../utils/translationUtils";
-import { useTranslate } from "../../utils/translationUtils";
-import { Picker } from "@react-native-picker/picker";
-import { API_URL } from "../../../constants/api";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import apiClient from "../../apiClient";
+import { Product } from "../../models/Entities";
+import { translateEntity, useTranslate } from "../../utils/translationUtils";
 
 type ProductDetailRouteProp = RouteProp<
   { params: { product: Product } },
