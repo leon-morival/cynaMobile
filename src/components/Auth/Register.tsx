@@ -44,7 +44,7 @@ const Register = () => {
     try {
       const body: any = {
         name: registerName,
-        email: registerEmail,
+        email: registerEmail.toLowerCase(),
         password: registerPassword,
         password_confirmation: registerConfirmPassword,
         civilite: registerCivilite,
@@ -123,7 +123,7 @@ const Register = () => {
         <AuthInput
           type="email"
           label={translate("email") + " :"}
-          value={registerEmail}
+          value={registerEmail.toLowerCase()}
           onChangeText={setRegisterEmail}
         />
         <Text style={styles.label}>{translate("title") + " :"}</Text>

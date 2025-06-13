@@ -28,7 +28,7 @@ const Login = ({ onLogin }: LoginProps) => {
       <AuthInput
         type="email"
         label={translate("email") + " :"}
-        value={loginEmail}
+        value={loginEmail.toLowerCase()}
         onChangeText={setLoginEmail}
       />
       <AuthInput
