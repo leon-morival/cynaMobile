@@ -11,7 +11,10 @@ import { useTranslate } from "../../utils/translationUtils";
 import { getSubscriptionInvoices } from "../../../services/subscriptionService";
 import { Colors } from "../../../constants/Colors";
 import { AuthContext } from "../../context/AuthContext";
+import { STORAGE_URL } from "../../../constants/api";
 import moment from "moment";
+import Pdf from "react-native-pdf";
+
 export default function InvoiceScreen() {
   const route = useRoute<any>();
   const { subscriptionId } = route.params;
@@ -27,7 +30,7 @@ export default function InvoiceScreen() {
       .then(setInvoices)
       .finally(() => setLoading(false));
   }, [subscriptionId, token]);
-
+  console.log("Invoices loaded:", invoices);
   if (loading) {
     return (
       <View style={styles.centered}>
@@ -43,35 +46,27 @@ export default function InvoiceScreen() {
       </View>
     );
   }
+  console.log("Invoices:", JSON.stringify(invoices, null, 2));
+  // On prend le premier invoice (ou adapte selon besoin)
+  const invoice = invoices[0];
 
+  const pdfUrl = STORAGE_URL + invoice.pdf_url;
+  console.log("PDF URL:", pdfUrl);
   return (
-    <ScrollView style={styles.container}>
+    <View style={{ flex: 1, backgroundColor: "#f8f8f8" }}>
       <Text style={styles.title}>{translate("invoices_for_subscription")}</Text>
-      {invoices.map(
-        (item) => (
-          console.log(item.period_start, item.period_end),
-          (
-            <View key={item.id} style={styles.invoiceBox}>
-              <Text style={styles.label}>
-                {translate("invoice_number")} :
-                <Text style={styles.value}>{" " + item.number}</Text>
-              </Text>
-              <Text style={styles.label}>
-                {translate("amount")} :
-                <Text style={styles.value}>{" " + item.ttc_amount} €</Text>
-              </Text>
-              <Text style={styles.label}>
-                {translate("period")} :
-                <Text style={styles.value}>
-                  {moment(item.period_start).format("DD/MM/YYYY")} -{" "}
-                  {moment(item.period_end).format("DD/MM/YYYY")}
-                </Text>
-              </Text>
-            </View>
-          )
-        )
-      )}
-    </ScrollView>
+      <Pdf
+        trustAllCerts={false}
+        source={{ uri: pdfUrl, cache: true }}
+        style={{ flex: 1, marginVertical: 10 }}
+        onError={(error) => {
+          console.log(error);
+        }}
+        renderActivityIndicator={() => (
+          <ActivityIndicator color={Colors.primary} size="large" />
+        )}
+      />
+    </View>
   );
 }
 
