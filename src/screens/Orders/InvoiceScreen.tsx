@@ -71,7 +71,11 @@ export default function InvoiceScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#f8f8f8", padding: 20 },
+  container: {
+    flex: 1,
+    backgroundColor: "#f8f8f8",
+    padding: 20,
+  },
   title: {
     fontSize: 24,
     fontWeight: "bold",

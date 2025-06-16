@@ -71,16 +71,12 @@ export default function CartScreen() {
         paymentIntentClientSecret: clientSecret,
         merchantDisplayName: "Cyna",
       });
-      console.log("initPaymentSheet result:", initResult);
       if (initResult.error) throw new Error(initResult.error.message);
       const presentResult = await presentPaymentSheet();
-      console.log("presentPaymentSheet result:", presentResult);
       if (presentResult.error) throw new Error(presentResult.error.message);
-      // Optionally: show success toast
-      fetchCart(); // refresh cart after payment
+      fetchCart();
     } catch (e) {
       console.log("Stripe PaymentSheet error:", e);
-      // Optionally: show error toast
     } finally {
       setPaying(false);
     }

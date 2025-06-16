@@ -174,12 +174,12 @@ export default function HomeScreen() {
       </ScrollView>
 
       {/* Chat Bot Floating Button */}
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={styles.chatBotButton}
         onPress={() => navigation.navigate(Routes.ChatBot as never)}
       >
         <Ionicons name="chatbubble-ellipses" size={28} color="white" />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 }

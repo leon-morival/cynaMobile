@@ -31,7 +31,7 @@ export default function PasswordChange() {
       if (!currentPassword) {
         setErrors((prev) => ({
           ...prev,
-          current_password: "Le mot de passe actuel est requis",
+          current_password: translate("current_password_required"),
         }));
         return;
       }
@@ -39,7 +39,7 @@ export default function PasswordChange() {
       if (!newPassword) {
         setErrors((prev) => ({
           ...prev,
-          password: "Le nouveau mot de passe est requis",
+          password: translate("new_password_required"),
         }));
         return;
       }
@@ -47,7 +47,7 @@ export default function PasswordChange() {
       if (newPassword.length < 8) {
         setErrors((prev) => ({
           ...prev,
-          password: "Le mot de passe doit contenir au moins 8 caractères",
+          password: translate("password_min_length"),
         }));
         return;
       }
@@ -55,7 +55,7 @@ export default function PasswordChange() {
       if (newPassword !== confirmPassword) {
         setErrors((prev) => ({
           ...prev,
-          password_confirmation: "Les mots de passe ne correspondent pas",
+          password_confirmation: translate("passwords_do_not_match"),
         }));
         return;
       }
@@ -65,8 +65,8 @@ export default function PasswordChange() {
       if (!token) {
         Toast.show({
           type: "error",
-          text1: "Erreur",
-          text2: "Vous devez être connecté pour modifier votre mot de passe",
+          text1: translate("error"),
+          text2: translate("must_be_logged_in_to_change_password"),
         });
         setIsLoading(false);
         return;
@@ -111,10 +111,10 @@ export default function PasswordChange() {
       } else {
         Toast.show({
           type: "error",
-          text1: "Erreur",
+          text1: translate("error"),
           text2:
             error?.response?.data?.message ||
-            "Une erreur est survenue lors de la modification du mot de passe",
+            translate("password_change_error"),
         });
       }
       setIsLoading(false);

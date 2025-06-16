@@ -76,7 +76,7 @@ const SettingsScreen = () => {
     Toast.show({
       type: "success",
       text1: "Logout",
-      text2: "Vous êtes déconnecté",
+      text2: translate("logout_success"),
     });
   };
 
