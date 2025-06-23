@@ -21,13 +21,13 @@ import { useTranslate } from "../../utils/translationUtils";
 const Register = () => {
   const [registerName, setRegisterName] = useState(__DEV__ ? "leon" : "");
   const [registerEmail, setRegisterEmail] = useState(
-    __DEV__ ? "leon@gmail.com" : ""
+    __DEV__ ? "leon.morival@gmail.com" : ""
   );
   const [registerPassword, setRegisterPassword] = useState(
-    __DEV__ ? "password" : ""
+    __DEV__ ? "Test1234*" : ""
   );
   const [registerConfirmPassword, setRegisterConfirmPassword] = useState(
-    __DEV__ ? "password" : ""
+    __DEV__ ? "Test1234*" : ""
   );
   const [registerSiret, setRegisterSiret] = useState("");
   const [registerCivilite, setRegisterCivilite] = useState(Civilite.MR);

@@ -4,7 +4,7 @@ Application mobile multi-plateforme développée avec React Native et Expo.
 
 ## À propos de l'application
 
-Cyna Mobile est une application qui [description brève de l'objectif principal de l'application]. Elle permet aux utilisateurs de [principales fonctionnalités].
+Cyna Mobile est une application qui permet d'effectuer des achats en ligne
 
 ## Technologies utilisées
 
@@ -14,14 +14,11 @@ Cyna Mobile est une application qui [description brève de l'objectif principal 
 
 ## Installation
 
-```bash
-# Cloner le dépôt
-git clone https://github.com/leon-morival/cyna-mobile.git
-cd cyna-mobile
-
 # Installer les dépendances
+
 npm i
-```
+
+````
 
 ## Développement
 
@@ -31,7 +28,7 @@ Utilisez le build de développement :
 
    ```bash
    npx expo prebuild --clean
-   ```
+````
 
 2. Lancez sur l'appareil/émulateur
 
@@ -42,12 +39,6 @@ Utilisez le build de développement :
    # Pour iOS
    npx expo run:ios
    ```
-
-## Fonctionnalités principales
-
-### Authentification
-
-L'application utilise [méthode d'authentification] pour gérer les sessions utilisateur. Les tokens sont stockés en sécurité avec [méthode de stockage].
 
 ## Déploiement
 
